@@ -16,3 +16,8 @@ https://earthobservatory.nasa.gov/Features/NightLights/page3.php
 
 #### Other:
 https://www.ngdc.noaa.gov/eog/viirs/download_dnb_composites.html
+
+
+
+Resources:
+https://earthobservatory.nasa.gov/Features/IntotheBlack
