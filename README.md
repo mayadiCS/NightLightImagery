@@ -23,3 +23,7 @@ http://dataportal.ins.tn/en/DataAnalysis
 
 Resources:
 https://earthobservatory.nasa.gov/Features/IntotheBlack
+
+
+Notes:
+- Inactive citizens do not get counted towards unemployment rates.
