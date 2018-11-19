@@ -1,0 +1,139 @@
+---
+title: "tunisia_pop"
+author: "Jesse Cahill"
+date: "11/14/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+I'll be doing analysis of total population and its gender proportions by governorate (region) in Tunisia.
+
+## Read in and Tidy Data
+
+```{r}
+tunisia_pop <- read_csv("governorate_pop.csv")
+tunisia_pop
+```
+
+```{r}
+tunisia_tidy <- tunisia_pop %>% 
+  gather(key="pop_type", value="population", -country, -region)
+print(tunisia_tidy)
+```
+
+
+## Plot 1 - Cleveland Dot Plot
+
+```{r, fig.height=10, fig.width=10}
+theme_dotplot <- theme_bw(18) +
+    theme(axis.text.y = element_text(size = rel(.75)),
+          axis.ticks.y = element_blank(),
+          axis.title.x = element_text(size = rel(.75)),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = 0.5),
+          panel.grid.minor.x = element_blank())
+
+
+ggplot(tunisia_tidy, aes(x = population, 
+                  y = fct_reorder2(region, pop_type, -population),
+                  color = pop_type
+                  )) + 
+    geom_point() + ylab("") + theme_dotplot + 
+    ggtitle("Number of fatalities per million traffic miles")
+```
+
+This plot would probably be good for someone with background knowledge of Tunisian governorates, but its hard to take specific information regarding those governorates as a person with little background knowledge of the ccountry.  It does show us that female population is nearly always larger than mail, and that this gap doesn't seem to be associated with the baseline population. We also get a decent idea of the spread of the data and the disparities between places like Tunis (which contains the capital) and Tataouine (which the desolate desert planet home of Luke Skywalker, Tatooine, was named after)
+
+## Plot 2 - Choropleth Map - Total Population
+
+```{r}
+library(choroplethrAdmin1)
+
+head(get_admin1_regions("tunisia"))
+```
+
+Looks like I just need to make everything lowercase, then subset the data to the choroplethr format and map.
+
+```{r}
+library(choroplethr)
+
+tunisia_pop_choropleth <- tunisia_pop %>% 
+  transmute(region = tolower(region),
+            value = total_15over)
+
+admin1_choropleth(country.name = "tunisia", 
+                  df           = tunisia_pop_choropleth, 
+                  title        = "2014 Tunisia Population Estimates", 
+                  legend       = "Population")
+```
+
+We're getting some NA regions, so there may be issues with spelling in the governorates (French spelling). In addition I think perhaps there have been changes to the governorates since ChoroplethrAdmin1 has been updated.  Since there's so few I'm just going to fix my regions by hand. Turns out Ariana isn't included on the choroplethr map, so I'll remove it from this dataset for now.  Also there are some minor misspellings.
+
+
+```{r}
+tunisia_pop_choropleth <- tunisia_pop_choropleth %>% 
+  filter(region != "gouvernorat de ariana")
+
+governorates <- c("gouvernorat de tunis",
+"gouvernorat de ben arous",
+"gouvernorat de la manouba",
+"gouvernorat de nabeul",
+"gouvernorat de zaghouan",
+"gouvernorat de bizerte",
+"gouvernorat de beja",
+"gouvernorat de jendouba",
+"gouvernorat de kef",
+"gouvernorat de siliana",
+"gouvernorat de sousse",
+"gouvernorat de monastir",
+"gouvernorat de mahdia",
+"gouvernorat de sfax",
+"gouvernorat de kairouan",
+"gouvernorat de kasserine",
+"gouvernorat de sidi bou zid",
+"gouvernorat de gabes",
+"gouvernorat de medenine",
+"gouvernorat de tataouine",
+"gouvernorat de gafsa",
+"gouvernorat de tozeur",
+"gouvernorat de kebili"
+)
+tunisia_pop_choropleth$region <- governorates
+
+admin1_choropleth(country.name = "tunisia", 
+                  df           = tunisia_pop_choropleth, 
+                  title        = "2014 Tunisia Population Estimates", 
+                  legend       = "Population")
+```
+
+
+This helped put the information in our dotplot into a spacial context.  We see that the large, desert provinces of Tataouine and Tozeur are in the south, and the highest populations are regions near water (most of the eastern coast boarders the mediterranean, and there is a large lake in the central region with some darker governorates).  It would be interesting to repeat this map with population density, I believe it would intensify the coastal effect.
+
+## Plot 3 - Choropleth Map - % Female
+
+```{r}
+tunisia_pop <- tunisia_pop %>% 
+  mutate(percent_female = female_15over / total_15over * 100)
+
+tunisia_pop_choropleth_female <- tunisia_pop %>% 
+  transmute(region = tolower(region),
+            value = percent_female)
+
+tunisia_pop_choropleth_female <- tunisia_pop_choropleth_female %>% 
+  filter(region != "gouvernorat de ariana")
+
+tunisia_pop_choropleth_female$region <- governorates
+
+admin1_choropleth(country.name = "tunisia", 
+                  df           = tunisia_pop_choropleth_female, 
+                  title        = "2014 Tunisia Population Percent Female Estimates", 
+                  legend       = "% Female")
+```
+
+I didn't know what I expected of this, but it seems like there is some spatial correlation, which needs to be taken with a grain of salt because of the relatively small range of difference.  But it seems like the smaller, northern and (presumably) more urban governorates tend to have lower female percentages than the larger, sparser, and more southern governorates.  Again, I think this would be a better comparison with population density rather than only population.
