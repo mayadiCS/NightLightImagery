@@ -37,5 +37,5 @@ rsconnect/
 
 # GIS Files
 # Shapefiles
-data/raw/satellite_imgs/
-data/raw/shapefiles/
+satellite_imgs/
+shapefiles/
