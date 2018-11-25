@@ -17,7 +17,7 @@ I'll be doing analysis of total population and its gender proportions by governo
 ## Read in and Tidy Data
 
 ```{r}
-tunisia_pop <- read_csv("governorate_pop.csv")
+tunisia_pop <- read_csv("../data/intermediate/hw4-jesse/governorate_pop.csv")
 tunisia_pop
 ```
 
