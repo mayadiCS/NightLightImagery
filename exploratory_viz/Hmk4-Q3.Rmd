@@ -1,0 +1,84 @@
+---
+title: "Homework 4"
+author: "Namson Ngo-Le"
+date: "November 14, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(ggthemes)
+library(ggrepel)
+```
+
+## Visualization 1 (Scatter Plot)
+
+For our final project, we are looking at how luminosity data in Tunisia predicts various economic indicators. Since we are still gathering the luminosity data, I decided to take a preliminary look at some of those economic indicators to see if there is anything that stands out beforehand. This data is taken from a 2014 census of Tunisia's population. Total number of internet users seemed like a decent proxy for how 'bright' a region would be, so I used that as my variable of interest.
+
+```{r 1}
+educ <- read_excel("educ.xlsx")
+ggplot(educ, aes(population,internet_tot)) + 
+    geom_point(color = "blue", size = 3) +theme_stata() + xlab("Total Population") + ylab("Internet Users") + ggtitle("Population vs. Internet Use in Tunisia by Governorate") + geom_smooth(method = "lm", se = TRUE)
+```
+
+Governorates are essentially provinces of Tunisia (there are 27 in total).
+
+I first decided to take a look at internet usage in Tunisia compared to population. Overall it seems to track very well with total population, as we should expect areas with more population to have more internet users. I decided to add governorate labels to the graph:
+
+```{r 2}
+ggplot(educ, aes(population,internet_tot)) + 
+    geom_point(color = "blue", size = 3) +theme_stata() + xlab("Total Population") + ylab("Internet Users") + ggtitle("Population vs. Internet Use in Tunisia by Governorate") + geom_smooth(method = "lm", se = TRUE)  + geom_label_repel(aes(label = province),
+                                                                                                                                                                                                                                                box.padding   = 0.35, 
+                                                                                                                                                                                                                                                point.padding = 0.5,
+                                                                                                                                                                                                                                                segment.color = 'grey50')
+```
+
+This certainly suggests that the capital of Tunisia - Tunis has the largest share of internet users and population in the country; I would expect it to be very brightly lit up once we get our light data. Another possible further question is whether internet usage or total population is better correlated with the luminosity 
+
+## Visualization 2 (Bar Graph)
+
+I wanted to adjust internet use for size of population to see if some regions had more internet users per capita.
+
+```{r 3, echo=FALSE}
+educ["int_pop_ratio"] = educ["internet_tot"] / educ["population"]
+
+ggplot(educ, aes(x = province, y = int_pop_ratio)) +
+     geom_bar(stat = "identity", fill = "darkgreen") +
+     ggtitle("Percent of Population that are Internet Users") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + xlab("Province") + ylab("Percent Internet Users")
+```
+
+As it turns out, Ariana and Ben Arous have a higher percentage of the population that are internet users than Tunis. When it comes to the light data, we will also compare luminosity per capita. If the relationship between internet users and luminosity holds, Ariana and Ben Arous could have higher luminosity per capita than the capital of Tunis.
+
+## Visualization 3 (Cleveland Dot Plot)
+
+I wanted to compare some other variables of interest to internet use, so I calculated the percent of the population that was illiterate and that attended college respectively and made a Cleveland Dot Plot of the three percentages.
+```{r 4, echo=FALSE}
+theme_dotplot <- theme_bw(14) +
+theme(axis.text.y = element_text(size = rel(.75)),
+axis.ticks.y = element_blank(),
+axis.title.x = element_text(size = rel(.75)),
+panel.grid.major.x = element_blank(),
+panel.grid.major.y = element_line(size = 0.5),
+panel.grid.minor.x = element_blank())
+
+
+educ["college_pop_ratio"] = educ["college_tot"] / educ["population"]
+educ["ill_pop_ratio"] = educ["illiterate_total"] / educ["population"]
+
+etidy <- educ %>%
+select(province, int_pop_ratio, ill_pop_ratio, college_pop_ratio) %>%
+gather(key = variable, value = percent, -province) %>%
+mutate(variable = factor(variable, levels = c("ill_pop_ratio", "college_pop_ratio", "int_pop_ratio")))
+
+
+ggplot(etidy, aes(percent, fct_reorder2(province, variable, -percent),
+color = variable)) +
+geom_point() + ylab("") +
+theme_dotplot + theme(legend.position = "top",
+legend.title = element_blank())
+
+```
+
+Overall the top 5 or so governorates have a higher percent of the population that has attended college, but this is not a particularly strong relationship. On the other hand, there are wide differences in illiteracy between governorates and a pretty clear negative relationship between illiteracy and internet use. If, again, we take internet use as a proxy for luminosity, we might expect some of the least literate governorates have the least light, while there to be not much of a difference in lumunosity between governorates with higher levels of college attendance and low levels of college attendance.
