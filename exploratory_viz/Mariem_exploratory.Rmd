@@ -142,3 +142,47 @@ ggplot(ttidy,aes(percent,fct_reorder2(Governorate, variable,-percent),color = va
 Yes.
 While the population of females is larger than that of man, the above graph does confirm the fact that for the vast majority of Governorates the female percent unemployment is lower than male's percent unemployment. Additionally, this graph shows that for the Governorates of Kebili, Manouba and Medenine, the pattern is reversed. That is an interesting fact worth investigating. An initial assumption is that those Governorates rely more heavily on farming and that may (or may not be) an occupation more acceessible to men. 
 It is also worth noting that the capital (which encompasses the Governorates of Tunis and Ariana) neither has the lowest nor the highest percent unemployment (both for males and females)
+
+
+
+### PART II
+
+```{r}
+lumData <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
+lumData$Gov_longName <- lumData$NAME_1
+lumData$Gov_longName <- sub("^", "Governorate of ", lumData$Gov_longName)
+lumData$Gov_longName <- ifelse(lumData$NAME_1 == "Kebili", "Governorate of Kebili", 
+                               ifelse(,)
+                               ,"NA")
+tbl_df(lumData)
+
+```
+
+```{r}
+lumData2013 <- lumData[lumData$year == "2013",]
+tbl_df(lumData2013)
+lumData2013$NAME_1
+```
+
+```{r fig.height=5, fig.width=5}
+g <- ggplot(lumData2013, aes(x = mean, y = fct_reorder(NAME_1, mean))) +
+    geom_point(color = "blue") + ylab("") +
+    ggtitle("Luminosity per Governovates in 2013 (mean)")
+g
+```
+
+
+```{r fig.height=5, fig.width=5}
+g <- ggplot(lumData2013, aes(x = lumData2013$media, y = fct_reorder(NAME_1, lumData2013$media))) +
+    geom_point(color = "blue") + ylab("") +
+    ggtitle("Luminosity per Governovates in 2013 (median)")
+g
+```
+
+```{r}
+governorate_gender_perct_unemploy_e$Governorate
+```
+
+```{r}
+tbl_df(lumData)
+```
