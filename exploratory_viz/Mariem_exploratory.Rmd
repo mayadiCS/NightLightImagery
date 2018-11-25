@@ -1,0 +1,144 @@
+---
+title: "Mariem_exploratory"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 3
+
+My team project evolves around exploring data about Tunisia. 
+Note: the term "Governorate" refers to the 24 *Counties* that devide the country.
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(reshape)
+```
+
+While the focus in this question will be the 'unemployment' variable, let us first explore our dataset.
+
+```{r}
+population_unemployed <- readxl::read_excel('../data/intermediate/hw4-mariem/Number of unemployed people from the population aged 15 years and over in 2014.xlsx')
+tbl_df(population_unemployed)
+```
+
+Let us have a closer look at the *unemployment* data (by number of individuals).
+```{r}
+skimr::skim(population_unemployed)
+```
+
+Let us also have a closer look at the *population* data.
+Note: total population will be used to calculate percent unemployment.
+
+```{r}
+population_all <- readxl::read_excel('../data/intermediate/hw4-mariem/Number of population aged 15 years and over in 2014.xlsx')
+tbl_df(population_all)
+```
+
+```{r}
+skimr::skim(population_all)
+```
+
+```{r}
+tidy_unemploy <- gather(select(population_unemployed,Male, Female, Governorate ), key, value, -Governorate)
+tbl_df(tidy_unemploy)
+```
+
+We will start with a simple bar plot to get a sense of population size by gender.
+```{r}
+tidy_total_pop <- gather(select(population_all,Male, Female, Governorate ), key, value, -Governorate)
+tbl_df(tidy_total_pop)
+```
+
+```{r}
+pop_gender <- tidy_total_pop %>% group_by(key) %>% summarize(population = sum(value))
+tbl_df(pop_gender)
+```
+
+### Graph 1
+
+```{r}
+ggplot(pop_gender, aes(x = key, y = population)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Total population by gender")
+```
+
+As of 2014, there are more females than males in Tunisia (all governorates included). Nevertheless, it is worth noting that the difference is not extreme. Both the Female and Male population is around 4 million.
+
+### Graph 2-a
+
+What about unemployment?
+
+```{r}
+unemploy_gender <- tidy_unemploy %>% group_by(key) %>% summarize(unemployment = sum(value))
+tbl_df(unemploy_gender)
+```
+
+```{r}
+ggplot(unemploy_gender, aes(x = key, y = unemployment)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Number of unemployed citizens by gender")
+```
+
+This is quite interesting information. While there are more *female* citizens in Tunisia, unemployment seems higher for *males*. But, the above graph is showing the sum of unemployed *individuals* as opposed to *percent* unemployment. We should therefore combine both data (total population & unemployment.)
+
+```{r}
+combo_pop_unemploy <- merge(tidy_unemploy ,tidy_total_pop,by=c("Governorate","key"))
+colnames(combo_pop_unemploy)[2] <- "gender"
+colnames(combo_pop_unemploy)[3] <- "unemployment"
+colnames(combo_pop_unemploy)[4] <- "population"
+combo_pop_unemploy_gender_perct_all <- combo_pop_unemploy %>% group_by(gender) %>% mutate(perc_unemploy = 100 * ((unemployment) / (population)))
+
+tbl_df(combo_pop_unemploy_gender_perct_all)
+```
+
+### Graph 2-b
+
+```{r}
+perct_u_byGender <- merge(unemploy_gender,pop_gender,by=c("key")) %>% mutate(perc_unemploy = 100 * ((unemployment) / (population))) %>% select(key, perc_unemploy)
+
+ggplot(perct_u_byGender, aes(x = key, y = perc_unemploy)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Percent unemployed citizens by gender")
+```
+
+The bar chart above confirms (even more clearly) that it is indeed the case that Female unemployment (as a percentage this time) is lower than that of men *at the country level*.
+
+### Graph 3
+
+Does that pattern persist throughout the different governorates?
+
+```{r, echo = FALSE}
+governorate_gender_perct_unemploy_e <- readxl::read_excel('../data/intermediate/hw4-mariem/governorate_gender_perct_unemploy.xlsx')
+```
+
+```{r}
+tbl_df(governorate_gender_perct_unemploy_e)
+```
+
+```{r}
+theme_dotplot <-theme_bw(14) +
+  theme(axis.text.y =element_text(size =rel(.75)),
+        axis.ticks.y =element_blank(),
+        axis.title.x =element_text(size =rel(.75)),
+        panel.grid.major.x =element_blank(),
+        panel.grid.major.y =element_line(size = 0.5),
+        panel.grid.minor.x =element_blank())
+
+
+ttidy <-  governorate_gender_perct_unemploy_e %>%
+  select(Governorate, female_perct_u, male_perct_u) %>%
+  gather(key = variable, value = percent,-Governorate) %>%
+  mutate(variable= factor(variable, levels =c("male_perct_u", "female_perct_u")))
+
+ggplot(ttidy,aes(percent,fct_reorder2(Governorate, variable,-percent),color = variable))+
+  geom_point() + ylab("")+
+  theme_dotplot +
+  theme(legend.position = "top",legend.title =element_blank())
+```
+
+Yes.
+While the population of females is larger than that of man, the above graph does confirm the fact that for the vast majority of Governorates the female percent unemployment is lower than male's percent unemployment. Additionally, this graph shows that for the Governorates of Kebili, Manouba and Medenine, the pattern is reversed. That is an interesting fact worth investigating. An initial assumption is that those Governorates rely more heavily on farming and that may (or may not be) an occupation more acceessible to men. 
+It is also worth noting that the capital (which encompasses the Governorates of Tunis and Ariana) neither has the lowest nor the highest percent unemployment (both for males and females)
