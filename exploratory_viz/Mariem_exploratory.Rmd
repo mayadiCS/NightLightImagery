@@ -192,7 +192,30 @@ tbl_df(lumData)
 exitDF <- 
   readxl::read_excel("../data/linkage/Distribution of immigrants and emigrants by reason of exit between 2009 and 2014 11_18_2018 02_41_54.xlsx")
 
-names(exitDF) <- exitDF[1,] 
-exitDF <- exitDF[-1,]
+names(exitDF) <- exitDF[1,] #copy 1st row
+exitDF <- exitDF[-1,] #remove 1st row from df
 colnames(exitDF)[1] <- "Governorate"
 ```
+
+```{r}
+#Only keep our 3 columns of interest 
+exitDF <- exitDF[,c(1,2,3,6)]
+names(exitDF)[2]<-"immigrant"
+names(exitDF)[3]<-"emigrant"
+names(exitDF)[4]<-"emigrant_betterLife"
+#as.numeric(as.character(exitDF$immigrant))
+exitDF$immigrant <- as.numeric(exitDF$immigrant)
+tbl_df(exitDF)
+```
+
+```{r fig.height=5, fig.width=5}
+exitDF_nototal <- exitDF[-1,]
+g <- ggplot(exitDF_nototal, aes(x = exitDF_nototal$immigrant, y = fct_reorder(Governorate, immigrant))) +
+    geom_point(color = "blue") + ylab("") +
+    ggtitle("Number of Immigrants coming to Tunisia between 2009 and 2014 (by Governorate)")
+g
+```
+
+### Comments:
+Note that we would need to divide the # of immigrants for each governorate by its specific population in order to have a normalized and more fair way to compare each 
+
