@@ -205,6 +205,8 @@ names(exitDF)[3]<-"emigrant"
 names(exitDF)[4]<-"emigrant_betterLife"
 #as.numeric(as.character(exitDF$immigrant))
 exitDF$immigrant <- as.numeric(exitDF$immigrant)
+exitDF$emigrant <- as.numeric(exitDF$emigrant)
+exitDF$emigrant_betterLife <- as.numeric(exitDF$emigrant_betterLife)
 tbl_df(exitDF)
 ```
 
@@ -217,5 +219,19 @@ g
 ```
 
 ### Comments:
-Note that we would need to divide the # of immigrants for each governorate by its specific population in order to have a normalized and more fair way to compare each 
+Note that we would need to divide the # of immigrants for each governorate by its specific population in order to have a normalized and more fair way to compare the different governorates to one another.
 
+
+```{r fig.height=5, fig.width=5}
+g <- ggplot(exitDF_nototal, aes(x = exitDF_nototal$emigrant, y = fct_reorder(Governorate, emigrant))) +
+    geom_point(color = "blue") + ylab("") +
+    ggtitle("Number of Emigrants leaving Tunisia between 2009 and 2014 (by Governorate)")
+g
+```
+
+```{r fig.height=5, fig.width=5}
+g <- ggplot(exitDF_nototal, aes(x = exitDF_nototal$emigrant_betterLife, y = fct_reorder(Governorate, emigrant_betterLife))) +
+    geom_point(color = "blue") + ylab("") +
+    ggtitle("Number of Emigrants coming or going out of Tunisia for acquisition of housing or better living conditions (by Governorate)")
+g
+```
