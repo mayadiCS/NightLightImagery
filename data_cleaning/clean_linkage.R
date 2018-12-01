@@ -3,8 +3,11 @@ read_tun_data <- function(filepath) {
   require(tidyverse)
   require(zoo)
   
-  df <- read_xlsx(filepath) %>% 
-    select(-X__1)
+  df <- read_xlsx(filepath)  
+  
+  if (as.character(df[3,2]) == "2014") {
+    df <- select(df, -X__1)
+  }
   
   # combine first and second rows 
   row1 <- as.character(df[1,])
@@ -19,3 +22,6 @@ read_tun_data <- function(filepath) {
   
   return(df)
 }
+
+test1 <- read_tun_data("/home/jeb/Documents/columbia_data_science/edav/NightLightImagery/data/raw/Households by possession of ICTs 11_18_2018 02_51_58.xlsx")
+test2 <- read_tun_data("/home/jeb/Documents/columbia_data_science/edav/NightLightImagery/data/raw/Households by possession of leisure resources 11_18_2018 02_51_43.xlsx")
