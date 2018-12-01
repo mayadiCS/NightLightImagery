@@ -164,10 +164,24 @@ tbl_df(lumData2013)
 lumData2013$NAME_1
 ```
 
+```{r}
+tbl_df(lumData2013)
+```
+### Comment:
+Sfax is the 2nd city from an economic stand point in Tunisia. It is surprising that it ranks relatively low for luminosity.
+Let us have a closer look:
+[insert Namsom luminosity mean Vs population sctatter plot]
+If we had all the pixel values we could consider plotting a box plot to get a better sense of variance within a governorate.
+
 ```{r fig.height=5, fig.width=5}
 g <- ggplot(lumData2013, aes(x = mean, y = fct_reorder(NAME_1, mean))) +
     geom_point(color = "blue") + ylab("") +
     ggtitle("Luminosity per Governovates in 2013 (mean)")
+g
+
+g <- ggplot(lumData2013, aes(x = lumData2013$media, y = fct_reorder(NAME_1, lumData2013$media))) +
+    geom_point(color = "blue") + ylab("") +
+    ggtitle("Luminosity per Governovates in 2013 (median)")
 g
 ```
 
@@ -178,6 +192,15 @@ g <- ggplot(lumData2013, aes(x = lumData2013$media, y = fct_reorder(NAME_1, lumD
     ggtitle("Luminosity per Governovates in 2013 (median)")
 g
 ```
+
+### Comment:
+Sfax is the 2nd city from an economic stand point in Tunisia. It is surprising that it ranks relatively low for luminosity.
+Let us have a closer look:
+[insert Namsom luminosity mean Vs population sctatter plot]
+If we had all the pixel values we could consider plotting a box plot to get a better sense of variance within a governorate.
+TODO: since we do not have that data, our chosen alternative is to extract the delegeations that fall under the sfax governorate (and other) and create a boxplot where each dot repersents the mean fo a delegations
+
+
 
 ```{r}
 governorate_gender_perct_unemploy_e$Governorate
@@ -220,6 +243,7 @@ g
 
 ### Comments:
 Note that we would need to divide the # of immigrants for each governorate by its specific population in order to have a normalized and more fair way to compare the different governorates to one another.
+Assuming data #s is in thousands - we have suspicion that the survey is not very accurate
 
 
 ```{r fig.height=5, fig.width=5}
@@ -234,4 +258,28 @@ g <- ggplot(exitDF_nototal, aes(x = exitDF_nototal$emigrant_betterLife, y = fct_
     geom_point(color = "blue") + ylab("") +
     ggtitle("Number of Emigrants coming or going out of Tunisia for acquisition of housing or better living conditions (by Governorate)")
 g
+```
+
+## Economic Indicators of the Population in 2014 
+
+```{r}
+econDF <- 
+  readxl::read_excel("../data/linkage/Economic Characteristics of the Population in 2014 11_18_2018 02_42_05.xlsx")
+
+names(econDF) <- econDF[1,] #copy 1st row
+econDF <- econDF[-1,] #remove 1st row from df
+#colnames(exitDF)[1] <- "Governorate"
+```
+
+## Households by sources of energy and their use
+
+```{r}
+hhEnergy <- 
+  readxl::read_excel("../data/linkage/Households by sources of energy and their use 11_18_2018 02_51_26.xlsx")
+
+names(hhEnergy) <- hhEnergy[1,] #copy 1st row
+hhEnergy <- hhEnergy[-1,] #remove 1st row from df
+#colnames(exitDF)[1] <- "Governorate"
+
+#REMOVE MOD 2 AND MOD 3 COLUMNS
 ```
