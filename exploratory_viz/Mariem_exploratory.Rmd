@@ -186,3 +186,13 @@ governorate_gender_perct_unemploy_e$Governorate
 ```{r}
 tbl_df(lumData)
 ```
+
+
+```{r}
+exitDF <- 
+  readxl::read_excel("../data/linkage/Distribution of immigrants and emigrants by reason of exit between 2009 and 2014 11_18_2018 02_41_54.xlsx")
+
+names(exitDF) <- exitDF[1,] 
+exitDF <- exitDF[-1,]
+colnames(exitDF)[1] <- "Governorate"
+```
