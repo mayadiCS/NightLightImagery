@@ -1,0 +1,30 @@
+---
+title: "clean_linkage"
+author: "Jesse Cahill"
+date: "12/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(here)
+library(zoo)
+
+df <- read_xlsx(here("data/raw", "Households by possession of electrical household equipements 11_18_2018 02_51_51.xlsx"))
+print(df)
+
+row1 <- as.character(df[1,])
+row2 <- paste0("_", as.character(df[2,]))
+df[1,] <- paste0(na.locf(row1, na.rm=FALSE), row2)
+df[1, 1:2] <- c("Region", "Year")
+
+newcols <- as.character(df[1, ])
+df <- df[3:nrow(df),]
+names(df) <- newcols
+
+```
+
