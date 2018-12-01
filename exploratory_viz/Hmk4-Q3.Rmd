@@ -82,3 +82,5 @@ legend.title = element_blank())
 ```
 
 Overall the top 5 or so governorates have a higher percent of the population that has attended college, but this is not a particularly strong relationship. On the other hand, there are wide differences in illiteracy between governorates and a pretty clear negative relationship between illiteracy and internet use. If, again, we take internet use as a proxy for luminosity, we might expect some of the least literate governorates have the least light, while there to be not much of a difference in lumunosity between governorates with higher levels of college attendance and low levels of college attendance.
+
+### Comment Testing!!!
