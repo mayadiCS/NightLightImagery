@@ -1,0 +1,155 @@
+---
+title: "final project work"
+author: "Namson Ngo-Le"
+date: "December 1, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(ggrepel) ###for the labels on the scatterplots
+```
+
+
+
+```{r 1}
+dataset <- read_excel("D:/dataset.xlsx") ###in data folder
+View(dataset)
+
+
+
+ggplot(dataset, aes(population,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+ggplot(dataset, aes(population,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE) + geom_label_repel(aes(label = governorate),                                                                             box.padding   = 0.35,                                                                         point.padding = 0.5,                                                                      segment.color = 'grey50')
+
+
+### you may wnt to drop tunis a it is a bit of an outlier
+
+
+ggplot(dataset, aes(tap_water,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+
+ggplot(dataset, aes(public_water,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+ggplot(dataset, aes(private_water,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+
+
+
+
+ggplot(dataset, aes(house_with_public_elec,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+
+
+ggplot(dataset, aes(house_with_nat_gas,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+ggplot(dataset, aes(house_with_public_water,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+
+
+
+ggplot(dataset, aes(house_with_public_sanitation,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+
+
+```
+
+```{r 3, echo=FALSE}
+dataset["public_elec_ratio"] = dataset["house_with_public_elec"] / dataset["tot_housing"]
+
+dataset["nat_gas_pct"] = dataset["house_with_nat_gas"] / dataset["tot_housing"]
+
+
+
+ggplot(dataset, aes(x = governorate, y = nat_gas_pct)) +
+     geom_bar(stat = "identity", fill = "darkgreen") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+dataset["no_public_elec"] = dataset["tot_housing"] - dataset["house_with_public_elec"]
+
+dataset["no_public_elec_pct"] = dataset["no_public_elec"] / dataset["tot_housing"]
+
+ggplot(dataset, aes(no_public_elec_pct,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE)
+
+ggplot(dataset, aes(x = governorate, y = public_elec_ratio)) +
+     geom_bar(stat = "identity", fill = "darkgreen") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+```
+###Comment 
+Add heatmaps!!!!!! to look into any sort of 0's that are missing
+
+```{r 4, echo=FALSE}
+theme_dotplot <- theme_bw(14) +
+theme(axis.text.y = element_text(size = rel(.75)),
+axis.ticks.y = element_blank(),
+axis.title.x = element_text(size = rel(.75)),
+panel.grid.major.x = element_blank(),
+panel.grid.major.y = element_line(size = 0.5),
+panel.grid.minor.x = element_blank())
+
+
+dataset["tap_ratio"] = dataset["tap_water"] / dataset["tot_households"]
+dataset["public_ratio"] = dataset["public_water"] / dataset["tot_households"]
+dataset["private"] = dataset["private_water"] / dataset["tot_households"]
+
+dtidy <- dataset %>%
+select(governorate, tap_ratio, public_ratio, private) %>%
+gather(key = variable, value = percent, -governorate) %>%
+mutate(variable = factor(variable, levels = c("tap_ratio", "public_ratio", "private")))
+
+
+ggplot(dtidy, aes(percent, fct_reorder2(governorate, variable, -percent),
+color = variable)) +
+geom_point() + ylab("") +
+theme_dotplot + theme(legend.position = "top",
+legend.title = element_blank())
+
+
+
+
+
+
+
+dataset["public_elec_pct"] = dataset["house_with_public_elec"] / dataset["tot_housing"]
+dataset["nat_gas_pct"] = dataset["house_with_nat_gas"] / dataset["tot_housing"]
+dataset["public_water_pct"] = dataset["house_with_public_water"] / dataset["tot_housing"]
+dataset["public_sanitation_pct"] = dataset["house_with_public_sanitation"] / dataset["tot_housing"]
+
+d2tidy <- dataset %>%
+select(governorate, nat_gas_pct, public_water_pct, public_sanitation_pct) %>%
+gather(key = variable, value = percent, -governorate) %>%
+mutate(variable = factor(variable, levels = c( "public_sanitation_pct",  "nat_gas_pct", "public_water_pct")))
+
+
+ggplot(d2tidy, aes(percent, fct_reorder2(governorate, variable, -percent),
+color = variable)) +
+geom_point() + ylab("") +
+theme_dotplot + theme(legend.position = "top",
+legend.title = element_blank())
+
+
+
+
+
+```
+
+# Comment
+
+Variables are divided by total number of housing
+What are the 0's
