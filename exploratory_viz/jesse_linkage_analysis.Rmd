@@ -1,0 +1,58 @@
+---
+title: "jesse_linkage_analysis"
+author: "Jesse Cahill"
+date: "12/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(here)
+library(zoo)
+
+#source custom functions
+source(here("data_cleaning", "clean_linkage.R"))
+```
+
+# Appliances
+
+## Tidying
+```{r}
+appliances <- read_tun_data(here("data/raw", 
+                                 "Households by possession of electrical household equipements 11_18_2018 02_51_51.xlsx"))
+appliances <- appliances %>% 
+  gather(contains("_"), key="key", value="value") %>% 
+  separate(key, into=c("Appliance", "Measure"), sep="_") %>% 
+  spread(Appliance, value)
+
+appliances_total <- appliances %>%
+  filter(Measure == "Total") %>% 
+  select(-Measure)
+
+ap_names = c("Region", "AC", "heat", "dishwasher", "stove", "fridge", "washing_machine")
+names(appliances_total) <- ap_names
+appliances_total <- appliances_total %>% 
+  mutate_at(.vars = vars(-Region), funs(as.numeric))
+```
+
+## Cleveland Dot-Plot
+Note - divide by total number of households (not housing)
+```{r}
+theme_dotplot <- theme_bw(18) +
+    theme(axis.text.y = element_text(size = rel(.75)),
+          axis.ticks.y = element_blank(),
+          axis.title.x = element_text(size = rel(.75)),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = 0.5),
+          panel.grid.minor.x = element_blank())
+
+#filter to only dishwashers to start off with
+
+g <- ggplot(appliances_total %>% select(Region, AC) %>% filter(Region != "Tunisia"), aes(x = AC, y = fct_reorder(Region, AC))) +
+    geom_point(color = "blue") + ylab("") +
+    theme_dotplot + ggtitle("Num AC")
+g
+```
+
