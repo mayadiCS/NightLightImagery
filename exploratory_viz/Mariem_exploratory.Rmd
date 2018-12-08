@@ -298,6 +298,12 @@ tbl_df(del_sfax)
 ```
 
 ```{r}
+boxplot(del_sfax$`1992_mean`, horizontal = TRUE)
+stripchart(del_sfax$`1992_mean`, col = "blue", pch = 21, add = TRUE, method = "jitter")
+```
+
+
+```{r}
 ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
   geom_boxplot() +
   geom_jitter(alpha = 0.2, width = 0.1, color = "#926d25") +
