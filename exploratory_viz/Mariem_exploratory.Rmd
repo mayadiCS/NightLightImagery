@@ -316,7 +316,38 @@ ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
 ```
 
 
+```{r}
+consumption2015 <- readxl::read_xlsx("../data/intermediate/Enquête Consommation 2010 12_08_2018 10_49_06.xlsx")
+
+names(consumption2015) <- consumption2015[1,] #copy 1st row
+consumption2015 <- consumption2015[-1,] #remove 1st row from df
+tbl_df(consumption)
+```
+
+### ChoroplethrAdmin1
+```{r}
+# see https://arilamstein.com/creating-administrative-level-1-maps/
+library(choroplethrAdmin1)
+head(get_admin1_countries())
+head(get_admin1_regions("tunisia"))
+admin1_map("tunisia")
+```
+
+
+```{r}
+
+data("continental_us_states")
+lower_canada = c("british columbia", "alberta", "saskatchewan", "manitoba", "ontario", "quebec")
+regions = c(lower_canada, continental_us_states)
+df = data.frame(region=regions, value=sample(1:length(regions)))
+
+admin1_region_choropleth(df) 
+```
+
+
 ### Testing branch 
+
+
 ```{r}
 library(tidyverse)
 library(choroplethr)
@@ -347,4 +378,5 @@ statebins(df_illit, value_col="Illiteracy",
   ggtitle("State Illiteracy Rates, 1977") +
   theme_statebins()
 ```
+
 
