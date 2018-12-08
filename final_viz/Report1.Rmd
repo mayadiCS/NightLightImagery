@@ -9,7 +9,11 @@ library(tidyverse)
 ```
 
 ## (1) Introduction
-
+- map of tunisia
+- star wars
+- hannibal
+- colesium
+- lack of usage of alternative data in the developing world
 
 ## (2) Description of data
 
@@ -27,7 +31,28 @@ Some of the variable names are unclear, probably due to shoddy translation (i.e.
 
 Extensive data processing
 
-### (4.a) Consumption by Governorates
+### (4.a) A First Look at Tunisia
+
+TODO: 
+- supress the warning messages (add appropriate notation inside {r ...})
+- remove Ariana from original data
+
+```{r 4}
+density <- read_excel("../data/intermediate/density.xlsx")
+library(choroplethrAdmin1)
+library(choroplethr)
+admin1_choropleth("tunisia", density, num_colors = 5, title = "Population Density", legend = "Population by square kilometer")
+```
+
+Comments:
+- coastal
+
+### (4.b) Consumption by Governorates
+
+TODO:
+- add after map bar plot or cleveland dot plot to show ranking of governorates by consumption
+
+
 ```{r}
 consumption2015 <- readxl::read_xlsx("../data/intermediate/Enquête Consommation 2010 12_08_2018 10_49_06.xlsx")
 
@@ -58,12 +83,28 @@ admin1_region_choropleth(df)
 
 ```
 
-### (4.b) "[Namson] scatter plot lowess"
+Comments:
+- show top 5
+- focus on sfax
 
-### (4.c) A closer at outliers: Sfax
+
+
+### (4.c) "[Namson] scatter plot lowess"
+```{r 1}
+dataset <- read_excel("../data/intermediate/dataset.xlsx")
+
+ggplot(dataset, aes(population,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE) + geom_label_repel(aes(label = governorate),                                                                             box.padding   = 0.35,                                                                         point.padding = 0.5,                                                                      segment.color = 'grey50')
+
+```
+
+Comments:
+- sfax outlier
+- general comment: eg. as population goes up luminsity goes up
+
+### (4.d) A closer at outliers: Sfax
 ```{r}
 lum_del <- read_csv("../data/intermediate/tun_lum_delegation_93_13.csv")
-tbl_df(lum_del)
 ```
 
 ```{r}
