@@ -20,39 +20,93 @@ source(here("data_cleaning", "clean_linkage.R"))
 
 ## Tidying
 ```{r}
+# appliance data
+  
 appliances <- read_tun_data(here("data/raw", 
-                                 "Households by possession of electrical household equipements 11_18_2018 02_51_51.xlsx"))
-appliances <- appliances %>% 
+                                 "Households by possession of electrical household equipements 11_18_2018 02_51_51.xlsx")) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
+  filter(Region != "Tunisia")
+    
+
+# household / population data
+house_pop <- read_csv(here("data/intermediate",
+                                "master_file.csv")) %>% 
+  rename(Region = governorate)
+
+appliances <- inner_join(select(house_pop, Region, households), appliances)
+```
+
+```{r}
+# tidy
+appliances <- appliances %>%
   gather(contains("_"), key="key", value="value") %>% 
   separate(key, into=c("Appliance", "Measure"), sep="_") %>% 
   spread(Appliance, value)
 
+# we only want total
 appliances_total <- appliances %>%
   filter(Measure == "Total") %>% 
   select(-Measure)
 
-ap_names = c("Region", "AC", "heat", "dishwasher", "stove", "fridge", "washing_machine")
+#fix the names
+ap_names = c("Region", "households", "AC", "heat", "dishwasher", "stove", "fridge", "washing_machine")
 names(appliances_total) <- ap_names
+
+# cleaning up
 appliances_total <- appliances_total %>% 
-  mutate_at(.vars = vars(-Region), funs(as.numeric))
+  mutate_at(.vars = vars(-Region), funs(as.numeric)) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) 
+
+
 ```
 
 ## Cleveland Dot-Plot
 Note - divide by total number of households (not housing)
 ```{r}
-theme_dotplot <- theme_bw(18) +
-    theme(axis.text.y = element_text(size = rel(.75)),
-          axis.ticks.y = element_blank(),
-          axis.title.x = element_text(size = rel(.75)),
-          panel.grid.major.x = element_blank(),
-          panel.grid.major.y = element_line(size = 0.5),
-          panel.grid.minor.x = element_blank())
+appliances_tidy <- appliances_total %>% 
+  gather(-Region, -households, key="app_type", value="num_apps") %>% 
+  mutate(app_household = num_apps / households)
 
-#filter to only dishwashers to start off with
-
-g <- ggplot(appliances_total %>% select(Region, AC) %>% filter(Region != "Tunisia"), aes(x = AC, y = fct_reorder(Region, AC))) +
-    geom_point(color = "blue") + ylab("") +
-    theme_dotplot + ggtitle("Num AC")
+g <- ggplot(appliances_tidy, aes(x = app_household,
+                                  y = fct_reorder2(Region, app_type, -app_household),
+                                  color = app_type)) +
+    geom_point() + ylab("") +
+    ggtitle("Number of Appliances Per Household")
 g
+```
+
+# Internet Connections 
+
+```{r}
+internet <- read_tun_data(here("data/raw", 
+                                 "Households by possession of ICTs 11_18_2018 02_51_58.xlsx")) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
+  filter(Region != "Tunisia") %>% 
+  # filter out the built in total thing
+
+internet <- inner_join(select(house_pop, Region, households), internet)
+```
+```{r}
+# tidy
+internet <- internet %>%
+  gather(contains("_"), key="key", value="value") %>% 
+  separate(key, into=c("Appliance", "Measure"), sep="_") %>% 
+  spread(Appliance, value)
+
+# we only want total
+internet_total <- internet %>%
+  filter(Measure == "Total") %>% 
+  select(-Measure)
+
+#fix the names
+internet_names = c("Region", "computer", "phone", "internet", "mobile", "households")
+names(internet_total) <- internet_names
+
+# cleaning up
+internet_total <- internet_total %>% 
+  mutate_at(.vars = vars(-Region), funs(as.numeric)) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) 
+
+
 ```
 
