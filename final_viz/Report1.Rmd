@@ -27,6 +27,63 @@ Some of the variable names are unclear, probably due to shoddy translation (i.e.
 
 Extensive data processing
 
+### (4.a) Consumption by Governorates
+```{r}
+consumption2015 <- readxl::read_xlsx("../data/intermediate/Enquête Consommation 2010 12_08_2018 10_49_06.xlsx")
+
+names(consumption2015) <- consumption2015[1,] #copy 1st row
+consumption2015 <- consumption2015[-1,] #remove 1st row from df
+tbl_df(consumption2015) 
+
+names(consumption2015)[1]<-"categories"
+
+totalConsump15 <- filter(consumption2015, consumption2015$categories == "Total")
+tidyConsump15 <- gather(totalConsump15, key="Governorates", value="Consumption")
+tidyConsump15 <- tidyConsump15[-1,]
+#tidyConsump15 <- filter(tidyConsump15, tidyConsump15$Governorates == "Total")
+
+#removing Greater regions
+tidyConsump15 <- filter(tidyConsump15, !Governorates %in% c("Great Tunis", "Governorate of Ariana", "North East", "North West","Par grandes régions\\Centre Est","Par grandes régions\\Centre Ouest","Par grandes régions\\Sud Est","Par grandes régions\\Sud Ouest"))
+
+#Note: Choroplethr does not include the governorate, "Governorate of Ariana" 
+
+#Rename governorate to match the ChoroplethrAdmin1 naming convention
+tidyConsump15$Governorates <- c("gouvernorat de tunis", "gouvernorat de ben arous", "gouvernorat de la manouba", "gouvernorat de nabeul", "gouvernorat de zaghouan", "gouvernorat de bizerte", "gouvernorat de beja","gouvernorat de jendouba","gouvernorat de kef","gouvernorat de siliana","gouvernorat de sousse","gouvernorat de monastir","gouvernorat de mahdia","gouvernorat de sfax","gouvernorat de kairouan","gouvernorat de kasserine","gouvernorat de sidi bou zid", "gouvernorat de gabes","gouvernorat de medenine","gouvernorat de tataouine","gouvernorat de gafsa","gouvernorat de tozeur","gouvernorat de kebili")
+
+as.numeric(as.character(exitDF$immigrant))
+
+df = data.frame(region=tidyConsump15$Governorates, value=as.numeric(as.character(tidyConsump15$Consumption)))
+
+admin1_region_choropleth(df) 
+
+```
+
+### (4.b) "[Namson] scatter plot lowess"
+
+### (4.c) A closer at outliers: Sfax
+```{r}
+lum_del <- read_csv("../data/intermediate/tun_lum_delegation_93_13.csv")
+tbl_df(lum_del)
+```
+
+```{r}
+del_sfax <- filter(lum_del,lum_del$NAME_1 == "Sfax")
+tbl_df(del_sfax)
+boxplot(del_sfax$`1992_mean`, horizontal = TRUE)
+stripchart(del_sfax$`1992_mean`, col = "blue", pch = 21, add = TRUE, method = "jitter")
+```
+```{r}
+ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.2, width = 0.1, color = "#926d25") +
+  coord_flip() +labs(y = "Luminosity (mean)", x = "Sfax delegation") +
+  ggtitle("What is wrong with Sfax?",
+          subtitle = "A closer look at luminosity by delegations within Sfax") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35"))
+```
+
+
 ## (5) Executive summary (Presentation-style)
 
 ## (6) Interactive component
