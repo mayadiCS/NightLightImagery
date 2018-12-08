@@ -284,4 +284,61 @@ hhEnergy <- hhEnergy[-1,] #remove 1st row from df
 #REMOVE MOD 2 AND MOD 3 COLUMNS
 ```
 
+
+```{r}
+lum_del <- read_csv("../data/intermediate/tun_lum_delegation_93_13.csv")
+tbl_df(lum_del)
+```
+
+```{r}
+#del_sfax <- lum_del %>% select(lum_del,)
+
+del_sfax <- filter(lum_del,lum_del$NAME_1 == "Sfax")
+tbl_df(del_sfax)
+```
+
+```{r}
+ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.2, width = 0.1, color = "#926d25") +
+  coord_flip() +labs(y = "Luminosity (mean)", x = "Sfax delegation") +
+  ggtitle("What is wrong with Sfax?",
+          subtitle = "A closer look at luminosity by delegations within Sfax") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35"))
+                     
+```
+
+
 ### Testing branch 
+```{r}
+library(tidyverse)
+library(choroplethr)
+
+# data frame must contain "region" and "value" columns
+
+df_illiteracy <- state.x77 %>% as.data.frame() %>% 
+  rownames_to_column("state") %>% 
+  transmute(region = tolower(`state`), value = Illiteracy)
+
+state_choropleth(df_illiteracy,
+                 title = "State Illiteracy Rates, 1977",
+                 legend = "Percent Illiterate")
+```
+
+```{r}
+library(statebins)
+df_illit <- state.x77 %>% as.data.frame() %>% 
+  rownames_to_column("state") %>% 
+  select(state, Illiteracy)
+
+# Note: direction = 1 switches the order of the fill scale 
+# so darker shades represent higher illiteracy rates
+# (The default is -1).
+
+statebins(df_illit, value_col="Illiteracy",
+          name = "%", direction = 1) +
+  ggtitle("State Illiteracy Rates, 1977") +
+  theme_statebins()
+```
+
