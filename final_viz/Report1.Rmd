@@ -1,0 +1,40 @@
+---
+title: "Report1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## (1) Introduction
+
+
+## (2) Description of data
+
+- Linkage data was collected from INS website
+- INS website is very slow
+- Planet didn’t provide large enough coverage eg. at the country level
+- Many sources for satellite imagery
+
+
+## (3) Analysis of data quality
+
+Some of the variable names are unclear, probably due to shoddy translation (i.e. what is the diff between ‘Number of households having drinking water from the public source or source of water association’ and ‘Number of households having drinking water from the other public or private source’?
+
+## (4) Main analysis (Exploratory Data Analysis)
+
+Extensive data processing
+
+## (5) Executive summary (Presentation-style)
+
+## (6) Interactive component
+
+## (7) Conclusion
+
+- Interested in looking at 2011 (year of the jasmine revolution) sicne the GDP went drastically down (Maybe less economic activity? Look into lumnisity?)
+- Time series of luminosity per governorate
+- !! Make a comment about coastal governorates
+- https://academic.oup.com/eurpub/article/24/suppl_1/6/560448 - info on Choucha refugee crisis and 20% increase in Medeneine population
+- Challenge: choroplethr naming for governorates is very specific and does not support french accent”. Two regions are missing.
+- Bin side - looked into curtomizing it but very time consuming 
