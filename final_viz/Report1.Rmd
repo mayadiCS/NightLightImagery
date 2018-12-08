@@ -1,0 +1,195 @@
+---
+title: "Report1"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## (1) Introduction
+- map of tunisia
+- star wars
+- hannibal
+- colesium
+- lack of usage of alternative data in the developing world
+
+## (2) Description of data
+
+- Linkage data was collected from INS website
+- INS website is very slow
+- Planet didn’t provide large enough coverage eg. at the country level
+- Many sources for satellite imagery
+
+
+## (3) Analysis of data quality
+
+Some of the variable names are unclear, probably due to shoddy translation (i.e. what is the diff between ‘Number of households having drinking water from the public source or source of water association’ and ‘Number of households having drinking water from the other public or private source’?
+- translation
+- stata
+
+## (4) Main analysis (Exploratory Data Analysis)
+
+Extensive data processing
+
+### (4.a) A First Look at Tunisia
+
+TODO: 
+- supress the warning messages (add appropriate notation inside {r ...})
+- remove Ariana from original data
+
+```{r message = FALSE, warning = FALSE}
+#density <- read_excel("../data/intermediate/density.xlsx")
+density <- readxl::read_xlsx("../data/intermediate/density.xlsx")
+library(choroplethrAdmin1)
+library(choroplethr)
+admin1_choropleth("tunisia", density, num_colors = 5, title = "Population Density", legend = "Population by square kilometer")
+```
+
+Comments:
+- coastal
+
+### (4.b) Consumption by Governorates
+
+TODO:
+- add after map bar plot or cleveland dot plot to show ranking of governorates by consumption
+
+
+```{r message = FALSE, warning = FALSE}
+consumption2015 <- readxl::read_xlsx("../data/intermediate/Enquête Consommation 2010 12_08_2018 10_49_06.xlsx")
+
+names(consumption2015) <- consumption2015[1,] #copy 1st row
+consumption2015 <- consumption2015[-1,] #remove 1st row from df
+
+names(consumption2015)[1]<-"categories"
+
+totalConsump15 <- filter(consumption2015, consumption2015$categories == "Total")
+tidyConsump15 <- gather(totalConsump15, key="Governorates", value="Consumption")
+tidyConsump15 <- tidyConsump15[-1,]
+#tidyConsump15 <- filter(tidyConsump15, tidyConsump15$Governorates == "Total")
+
+#removing Greater regions
+tidyConsump15 <- filter(tidyConsump15, !Governorates %in% c("Great Tunis", "Governorate of Ariana", "North East", "North West","Par grandes régions\\Centre Est","Par grandes régions\\Centre Ouest","Par grandes régions\\Sud Est","Par grandes régions\\Sud Ouest"))
+
+#Note: Choroplethr does not include the governorate, "Governorate of Ariana" 
+
+#Rename governorate to match the ChoroplethrAdmin1 naming convention
+tidyConsump15$Governorates <- c("gouvernorat de tunis", "gouvernorat de ben arous", "gouvernorat de la manouba", "gouvernorat de nabeul", "gouvernorat de zaghouan", "gouvernorat de bizerte", "gouvernorat de beja","gouvernorat de jendouba","gouvernorat de kef","gouvernorat de siliana","gouvernorat de sousse","gouvernorat de monastir","gouvernorat de mahdia","gouvernorat de sfax","gouvernorat de kairouan","gouvernorat de kasserine","gouvernorat de sidi bou zid", "gouvernorat de gabes","gouvernorat de medenine","gouvernorat de tataouine","gouvernorat de gafsa","gouvernorat de tozeur","gouvernorat de kebili")
+
+#as.numeric(as.character(exitDF$immigrant))
+
+df = data.frame(region=tidyConsump15$Governorates, value=as.numeric(as.character(tidyConsump15$Consumption)))
+
+admin1_region_choropleth(df) 
+
+```
+
+Comments:
+- show top 5
+- focus on sfax
+
+
+
+### (4.c) "[Namson] scatter plot lowess"
+```{r message = FALSE, warning = FALSE}
+#dataset <- read_excel("../data/intermediate/dataset.xlsx")
+dataset <- readxl::read_xlsx("../data/intermediate/dataset.xlsx")
+
+ggplot(dataset, aes(population,mean)) + 
+    geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE) + geom_label_repel(aes(label = governorate),                                                                             box.padding   = 0.35,                                                                         point.padding = 0.5,                                                                      segment.color = 'grey50')
+
+```
+
+Comments:
+- sfax outlier
+- general comment: eg. as population goes up luminsity goes up
+
+### (4.d) A closer at outliers: Sfax
+```{r}
+lum_del <- read_csv("../data/intermediate/tun_lum_delegation_93_13.csv")
+```
+
+```{r}
+del_sfax <- filter(lum_del,lum_del$NAME_1 == "Sfax")
+tbl_df(del_sfax)
+boxplot(del_sfax$`1992_mean`, horizontal = TRUE)
+stripchart(del_sfax$`1992_mean`, col = "blue", pch = 21, add = TRUE, method = "jitter")
+```
+```{r}
+ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.2, width = 0.1, color = "#926d25") +
+  coord_flip() +labs(y = "Luminosity (mean)", x = "Sfax delegation") +
+  ggtitle("What is wrong with Sfax?",
+          subtitle = "A closer look at luminosity by delegations within Sfax") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35"))
+```
+
+ 
+### (4.e) Exploring potential covariates of luminosity
+```{r message = FALSE, warning = FALSE}
+appliances <- read_tun_data(here("data/raw", 
+                                 "Households by possession of electrical household equipements 11_18_2018 02_51_51.xlsx")) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
+  filter(Region != "Tunisia")
+    
+
+# household / population data
+house_pop <- read_csv(here("data/intermediate",
+                                "master_file.csv")) %>% 
+  rename(Region = governorate)
+
+appliances <- inner_join(select(house_pop, Region, households), appliances)
+```
+
+```{r message = FALSE, warning = FALSE}
+# tidy
+appliances <- appliances %>%
+  gather(contains("_"), key="key", value="value") %>% 
+  separate(key, into=c("Appliance", "Measure"), sep="_") %>% 
+  spread(Appliance, value)
+
+# we only want total
+appliances_total <- appliances %>%
+  filter(Measure == "Total") %>% 
+  select(-Measure)
+
+#fix the names
+ap_names = c("Region", "households", "AC", "heat", "dishwasher", "stove", "fridge", "washing_machine")
+names(appliances_total) <- ap_names
+
+# cleaning up
+appliances_total <- appliances_total %>% 
+  mutate_at(.vars = vars(-Region), funs(as.numeric)) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) 
+```
+ 
+```{r message = FALSE, warning = FALSE}
+appliances_tidy <- appliances_total %>% 
+  gather(-Region, -households, key="app_type", value="num_apps") %>% 
+  mutate(app_household = num_apps / households)
+
+g <- ggplot(appliances_tidy, aes(x = app_household,
+                                  y = fct_reorder2(Region, app_type, -app_household),
+                                  color = app_type)) +
+    geom_point() + ylab("") +
+    ggtitle("Number of Appliances Per Household")
+g
+```
+ 
+## (5) Executive summary (Presentation-style)
+
+## (6) Interactive component
+
+## (7) Conclusion
+
+- Interested in looking at 2011 (year of the jasmine revolution) sicne the GDP went drastically down (Maybe less economic activity? Look into lumnisity?)
+- Time series of luminosity per governorate
+- !! Make a comment about coastal governorates
+- https://academic.oup.com/eurpub/article/24/suppl_1/6/560448 - info on Choucha refugee crisis and 20% increase in Medeneine population
+- Challenge: choroplethr naming for governorates is very specific and does not support french accent”. Two regions are missing.
+- Bin side - looked into curtomizing it but very time consuming 

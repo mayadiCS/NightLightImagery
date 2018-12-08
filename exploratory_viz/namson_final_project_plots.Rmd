@@ -15,7 +15,7 @@ library(ggrepel) ###for the labels on the scatterplots
 
 
 ```{r 1}
-dataset <- read_excel("D:/dataset.xlsx") ###in data folder
+dataset <- read_excel("C:/Users/NAMSON/NightLightImagery/data/intermediate/dataset.xlsx") ###in data folder
 View(dataset)
 
 
@@ -153,3 +153,18 @@ legend.title = element_blank())
 
 Variables are divided by total number of housing
 What are the 0's
+
+
+
+
+```{r 4}
+density <- read_excel("C:/Users/NAMSON/NightLightImagery/data/intermediate/density.xlsx")
+library(choroplethrAdmin1)
+library(choroplethr)
+get_admin1_regions("tunisia")
+admin1_choropleth("tunisia", density, num_colors = 5, title = "Population Density", legend = "Population by square kilometer")
+
+ggplot(dataset, aes(x = fct_reorder(governorate,area), y = area)) +
+     geom_bar(stat = "identity") +
+     ggtitle("Governorates Ordered by Area in km^2") + coord_flip()
+```
