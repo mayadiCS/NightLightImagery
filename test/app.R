@@ -10,27 +10,55 @@
 library(shiny)
 
 # Define UI for application that draws a histogram
+# ui <- fluidPage(
+#    
+#    # Application title
+#    titlePanel("Luminosity over time"),
+#    
+#    # Sidebar with a slider input for number of bins 
+#    sidebarLayout(
+#       sidebarPanel(
+#          sliderInput("years",
+#                      "Choose a year:",
+#                      min = 1992,
+#                      max = 2013,
+#                      value = 1)
+#       ),
+#       
+#       # Show a plot of the generated distribution
+#       mainPanel(
+#          plotOutput("dotplot"),
+#          plotOutput("dotplot2")
+#       )
+#    )
+# )
+
+
+
+
+###
+
 ui <- fluidPage(
-   
-   # Application title
-   titlePanel("Luminosity over time"),
-   
-   # Sidebar with a slider input for number of bins 
-   sidebarLayout(
-      sidebarPanel(
-         sliderInput("years",
-                     "Choose a year:",
-                     min = 1992,
-                     max = 2013,
-                     value = 1)
-      ),
-      
-      # Show a plot of the generated distribution
-      mainPanel(
-         plotOutput("dotplot"),
-         plotOutput("dotplot2")
-      )
-   )
+  
+  title = "Diamonds Explorer",
+  
+  plotOutput('dotplot'),
+  
+  hr(),
+  
+  fluidRow(
+    column(3),
+    column(4, offset = 1,
+           sliderInput("years",
+                       "Choose a year:",
+                       min = 1992,
+                       max = 2013,
+                       value = 1)
+    ),
+    column(4)
+  ),
+  hr(),
+  plotOutput('dotplot2')
 )
 
 # Define server logic required to draw a histogram
