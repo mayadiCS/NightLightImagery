@@ -42,7 +42,7 @@ ui <- fluidPage(
   
   title = "Diamonds Explorer",
   
-  plotOutput('dotplot'),
+  plotOutput('mapLum'),
   
   hr(),
   
@@ -58,7 +58,7 @@ ui <- fluidPage(
     column(4)
   ),
   hr(),
-  plotOutput('dotplot2')
+  plotOutput('dotplot')
 )
 
 # Define server logic required to draw a histogram
@@ -80,20 +80,18 @@ server <- function(input, output) {
         ggtitle("Luminosity per Governovates in 2013 (mean)")
    })
    
-   output$dotplot2 <- renderPlot({
+   output$mapLum <- renderPlot({
      # generate bins based on input$bins from ui.R
      lumData <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
      lumData2013 <- lumData[lumData$year == input$years,]
      
-     # x    <- faithful[, 2] 
-     # bins <- seq(min(x), max(x), length.out = input$bins + 1)
-     # 
-     # # draw the histogram with the specified number of bins
-     # hist(x, breaks = bins, col = 'darkgray', border = 'white')
+     tidyLum13 <- lumData2013 %>% select(NAME_1, mean)
+     tidyLum13 <- filter(tidyLum13, !NAME_1 %in% c("Ariana"))
+     tidyLum13$NAME_1 <- c("gouvernorat de kebili","gouvernorat de kef","gouvernorat de mahdia","gouvernorat de la manouba","gouvernorat de medenine","gouvernorat de monastir","gouvernorat de nabeul","gouvernorat de sfax","gouvernorat de sidi bou zid","gouvernorat de siliana","gouvernorat de sousse","gouvernorat de beja","gouvernorat de tataouine","gouvernorat de tozeur","gouvernorat de tunis","gouvernorat de zaghouan","gouvernorat de ben arous","gouvernorat de bizerte","gouvernorat de gabes","gouvernorat de gafsa","gouvernorat de jendouba","gouvernorat de kairouan","gouvernorat de kasserine")
      
-     ggplot(lumData2013, aes(x = mean, y = fct_reorder(NAME_1, mean))) +
-       geom_point(color = "blue") + ylab("") +
-       ggtitle("Luminosity per Governovates in 2013 (mean)")
+     df = data.frame(region=tidyLum13$NAME_1, value=as.numeric(as.character(tidyLum13$mean)))
+     
+     admin1_region_choropleth(df) 
    })
 }
 
