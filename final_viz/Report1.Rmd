@@ -1,13 +1,17 @@
 ---
 title: "Report1"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
+library(here)
+library(zoo)
+source(here("data_cleaning", "clean_linkage.R"))
 ```
 
 ## (1) Introduction
@@ -97,6 +101,7 @@ Comments:
 ```{r message = FALSE, warning = FALSE}
 #dataset <- read_excel("../data/intermediate/dataset.xlsx")
 dataset <- readxl::read_xlsx("../data/intermediate/dataset.xlsx")
+library(ggrepel)
 
 ggplot(dataset, aes(population,mean)) + 
     geom_point(color = "blue", size = 3) + geom_smooth(method = "lm", se = TRUE) + geom_label_repel(aes(label = governorate),                                                                             box.padding   = 0.35,                                                                         point.padding = 0.5,                                                                      segment.color = 'grey50')
