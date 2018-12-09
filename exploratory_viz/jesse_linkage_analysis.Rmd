@@ -2,7 +2,9 @@
 title: "jesse_linkage_analysis"
 author: "Jesse Cahill"
 date: "12/1/2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +13,6 @@ library(tidyverse)
 library(readxl)
 library(here)
 library(zoo)
-
 #source custom functions
 source(here("data_cleaning", "clean_linkage.R"))
 ```
@@ -60,19 +61,36 @@ appliances_total <- appliances_total %>%
 
 ```
 
-## Cleveland Dot-Plot
-Note - divide by total number of households (not housing)
-```{r}
-appliances_tidy <- appliances_total %>% 
-  gather(-Region, -households, key="app_type", value="num_apps") %>% 
-  mutate(app_household = num_apps / households)
 
-g <- ggplot(appliances_tidy, aes(x = app_household,
-                                  y = fct_reorder2(Region, app_type, -app_household),
-                                  color = app_type)) +
+```{r, fig.height=10}
+#plots
+
+appliances_tidy <- appliances_total %>% 
+  gather(-Region, -households, key="appliances_type", value="num_appliances") %>% 
+  mutate(appliances_household = num_appliances / households)
+
+g_stacked <- ggplot(appliances_tidy, aes(y = appliances_household,
+                                  x = fct_reorder2(Region, appliances_type, -appliances_household),
+                                  fill = appliances_type)) +
+    coord_flip() +
+    geom_bar(stat="identity") + ylab("") +
+    ggtitle("appliances Resources per Household")
+
+g_dot <- ggplot(appliances_tidy, aes(x = appliances_household,
+                                  y = fct_reorder2(Region, appliances_type, -appliances_household),
+                                  color = appliances_type)) +
     geom_point() + ylab("") +
-    ggtitle("Number of Appliances Per Household")
-g
+    ggtitle("appliances Resources per Household")
+
+g_dot_facet <- ggplot(appliances_tidy, aes(x = appliances_household,
+                                  y = reorder(Region, appliances_household))) + 
+    geom_point() + ylab("") +
+    ggtitle("appliances Resources per Household")
+
+g_stacked
+g_dot
+
+g_dot_facet + facet_wrap(~appliances_type, ncol=1)
 ```
 
 # Internet Connections 
@@ -82,10 +100,11 @@ internet <- read_tun_data(here("data/raw",
                                  "Households by possession of ICTs 11_18_2018 02_51_58.xlsx")) %>% 
   mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
   filter(Region != "Tunisia") %>% 
-  # filter out the built in total thing
+  select(-contains("households_"))
 
 internet <- inner_join(select(house_pop, Region, households), internet)
 ```
+
 ```{r}
 # tidy
 internet <- internet %>%
@@ -99,7 +118,7 @@ internet_total <- internet %>%
   select(-Measure)
 
 #fix the names
-internet_names = c("Region", "computer", "phone", "internet", "mobile", "households")
+internet_names = c("Region", "households", "computer", "landline", "internet", "mobile")
 names(internet_total) <- internet_names
 
 # cleaning up
@@ -109,4 +128,132 @@ internet_total <- internet_total %>%
 
 
 ```
+
+
+```{r, fig.height=10}
+#graph it
+
+internet_tidy <- internet_total %>% 
+  gather(-Region, -households, key="ict_type", value="num_ict") %>% 
+  mutate(ict_household = num_ict / households)
+
+g_stacked <- ggplot(internet_tidy, aes(y = ict_household,
+                                  x = fct_reorder2(Region, ict_type, -ict_household),
+                                  fill = ict_type)) +
+    coord_flip() +
+    geom_bar(stat="identity") + ylab("") +
+    ggtitle("ICT Resources per Household")
+
+g_dot <- ggplot(internet_tidy, aes(x = ict_household,
+                                  y = fct_reorder2(Region, ict_type, -ict_household),
+                                  color = ict_type)) +
+    geom_point() + ylab("") +
+    ggtitle("ICT Resources per Household")
+
+g_dot_facet <- ggplot(internet_tidy, aes(x = ict_household,
+                                  y = reorder(Region, ict_household))) + 
+    geom_point() + ylab("") +
+    ggtitle("internet Resources per Household")
+
+g_stacked
+g_dot
+
+g_dot_facet + facet_wrap(~ict_type, ncol=1)
+```
+
+# Leisure Resources
+```{r}
+leisure <- read_tun_data(here("data/raw", 
+                                 "Households by possession of leisure resources 11_18_2018 02_51_43.xlsx")) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
+  filter(Region != "Tunisia") %>% 
+  select(-contains("households_"))
+
+leisure <- inner_join(select(house_pop, Region, households), leisure)
+```
+```{r}
+# tidy
+leisure <- leisure %>%
+  gather(contains("_"), key="key", value="value") %>% 
+  separate(key, into=c("Appliance", "Measure"), sep="_") %>% 
+  spread(Appliance, value)
+
+# we only want total
+leisure_total <- leisure %>%
+  filter(Measure == "Total") %>% 
+  select(-Measure)
+
+#fix the names
+leisure_names = c("Region", "households", "car", "library", "dish", "radio", "TV")
+names(leisure_total) <- leisure_names
+
+# cleaning up
+leisure_total <- leisure_total %>% 
+  mutate_at(.vars = vars(-Region), funs(as.numeric)) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) 
+
+
+```
+
+```{r, fig.height=10}
+leisure_tidy <- leisure_total %>% 
+  gather(-Region, -households, key="leisure_type", value="num_leisure") %>% 
+  mutate(leisure_household = num_leisure / households)
+
+g_stacked <- ggplot(leisure_tidy, aes(y = leisure_household,
+                                  x = fct_reorder2(Region, leisure_type, -leisure_household),
+                                  fill = leisure_type)) +
+    coord_flip() +
+    geom_bar(stat="identity") + ylab("") +
+    ggtitle("Leisure Resources per Household")
+
+g_dot <- ggplot(leisure_tidy, aes(x = leisure_household,
+                                  y = fct_reorder2(Region, leisure_type, -leisure_household),
+                                  color = leisure_type)) +
+    geom_point() + ylab("") +
+    ggtitle("Leisure Resources per Household")
+
+g_dot_facet <- ggplot(leisure_tidy, aes(x = leisure_household,
+                                  y = reorder(Region, leisure_household))) + 
+    geom_point() + ylab("") +
+    ggtitle("Leisure Resources per Household")
+
+g_stacked
+g_dot
+
+g_dot_facet + facet_wrap(~leisure_type, ncol=1)
+```
+
+# Distribution of Occupation by activity sector
+
+## Parallel Coordinate Plot to Show how Activity Sectors covary
+
+```{r}
+occupation <- read_tun_data(here("data/raw", 
+                                 "Distribution of the occupied population aged 15 years and over by the activity sector 11_18_2018 02_45_07.xlsx")) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
+  filter(Region != "Tunisia")
+
+occupation <- occupation %>% 
+  mutate_at(vars(contains("_")), function(x) as.numeric(x) / house_pop$over_15_population) %>% 
+  select(-ends_with("Total"))
+
+occupation <- occupation %>%
+  gather(contains("_"), key="key", value="value") %>% 
+  separate(key, into=c("sector", "gender"), sep="_") %>% 
+  spread(sector, value)
+
+```
+
+```{r, fig.width=13}
+library(GGally)
+# add y label - percent of total pop over 15 employed
+occ_names <- c("Region", "gender", "Agr./Fishing", "Pub. Works", "Education/Health/Admin", "Manufacturing", "Mines/Energy", 
+          "Other Serv.", "Trade", "Transport", "Undeclares")
+names(occupation) <- occ_names
+ggparcoord(occupation, columns = 3:11, alphaLines = .5,
+           scale = "uniminmax", splineFactor = 10, groupColumn = 2) + 
+  geom_vline(xintercept = 2:9, color = "lightblue")
+```
+
 
