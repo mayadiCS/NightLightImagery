@@ -167,4 +167,20 @@ admin1_choropleth("tunisia", density, num_colors = 5, title = "Population Densit
 ggplot(dataset, aes(x = fct_reorder(governorate,area), y = area)) +
      geom_bar(stat = "identity") +
      ggtitle("Governorates Ordered by Area in km^2") + coord_flip()
+
+
+
+
+
+
+leaflet(tun) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(stroke = FALSE,
+              smoothFactor = 0.2,
+              fillOpacity = .8,
+              popup = nhpopup,
+              color = ~tp(tun$mean)
+              )
+
+
 ```
