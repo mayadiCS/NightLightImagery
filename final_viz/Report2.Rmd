@@ -11,6 +11,7 @@ library(tidyverse)
 library(readxl)
 library(here)
 library(zoo)
+library(reshape2)
 source(here("data_cleaning", "clean_linkage.R"))
 ```
 
@@ -64,7 +65,47 @@ Comments:
 - point out tunis
 - Note: (1/24) Gov Ariana not included in the ChoroplethrAdmin 1 library
 
-### (4.b) Consumption by Governorates
+
+### (4.b) Population breakdown by Industry and Gender
+
+```{r}
+occupation <- read_tun_data(here("data/raw", 
+                                 "Distribution of the occupied population aged 15 years and over by the activity sector 11_18_2018 02_45_07.xlsx")) %>% 
+  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
+  filter(Region != "Tunisia")
+
+occupation <- occupation %>% 
+  mutate_at(vars(contains("_")), function(x) as.numeric(x) / house_pop$over_15_population) %>% 
+  select(-ends_with("Total"))
+
+occupation <- occupation %>%
+  gather(contains("_"), key="key", value="value") %>% 
+  separate(key, into=c("sector", "gender"), sep="_") %>% 
+  spread(sector, value)
+
+```
+
+```{r, fig.width=13, message = FALSE, warning = FALSE}
+library(GGally)
+# add y label - percent of total pop over 15 employed
+occ_names <- c("Region", "gender", "Agr./Fishing", "Pub. Works", "Education/Health/Admin", "Manufacturing", "Mines/Energy", 
+          "Other Serv.", "Trade", "Transport", "Undeclares")
+names(occupation) <- occ_names
+ggparcoord(occupation, columns = 3:11, alphaLines = .5,
+           scale = "uniminmax", splineFactor = 10, groupColumn = 2) + 
+  geom_vline(xintercept = 2:9, color = "lightblue") +
+    ggtitle("Gender Disparity by Industry",
+          subtitle = "Year: 2014") +
+  labs(x = "Industry", y= "Percent employed", caption = "Source: L'Institut National de la Statistique (INS)") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+  theme(plot.caption = element_text(color = "grey68"))
+```
+
+Comments:
+- interesting peak for mines/energy and manufactoring
+
+### (4.c) Consumption by Governorates
 
 TODO:
 - add after map bar plot or cleveland dot plot to show ranking of governorates by consumption
@@ -115,7 +156,7 @@ Comments:
 
 
 
-### (4.c) Luminosity trends across Tunisia
+### (4.d) Luminosity trends across Tunisia
 ```{r message = FALSE, warning = FALSE}
 dataset <- readxl::read_xlsx("../data/intermediate/dataset.xlsx")
 library(ggrepel)
@@ -138,9 +179,6 @@ Comments:
 - general comment: eg. as population goes up luminsity goes up
 - "transition comment": Looking at consumption in descending order
 
-
-
-
 ```{r}
 tidyConsump15$Consumption <- as.numeric(tidyConsump15$Consumption)/ 1000000
 g <- ggplot(tidyConsump15, aes(x = Consumption, y = fct_reorder(Governorates, Consumption))) +
@@ -157,7 +195,7 @@ g
 Comments:
 - note sfax is part of top 5 but is a clear outlier in the lowess plot
 
-### (4.d) A closer at outliers: Sfax
+### (4.e) A closer at outliers: Sfax
 ```{r message = FALSE, warning = FALSE}
 lum_del <- read_csv("../data/intermediate/tun_lum_delegation_93_13.csv")
 
@@ -186,7 +224,7 @@ Comments:
 What might explain such variation in luminosity?
 - a little more
 
-### (4.e) Exploring potential covariates of luminosity
+### (4.f) Exploring potential covariates of luminosity
 
 ```{r message = FALSE, warning = FALSE}
 # appliance data
@@ -360,42 +398,87 @@ g_stacked
 
 ```
 
-# Distribution of Occupation by activity sector
 
-## Parallel Coordinate Plot to Show how Activity Sectors covary
+```{r message = FALSE, warning = FALSE}
+lum <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
 
-```{r}
-occupation <- read_tun_data(here("data/raw", 
-                                 "Distribution of the occupied population aged 15 years and over by the activity sector 11_18_2018 02_45_07.xlsx")) %>% 
-  mutate(Region = str_replace(Region, "Governorate of ", "")) %>% # Standardize governorate names
-  filter(Region != "Tunisia")
-
-occupation <- occupation %>% 
-  mutate_at(vars(contains("_")), function(x) as.numeric(x) / house_pop$over_15_population) %>% 
-  select(-ends_with("Total"))
-
-occupation <- occupation %>%
-  gather(contains("_"), key="key", value="value") %>% 
-  separate(key, into=c("sector", "gender"), sep="_") %>% 
-  spread(sector, value)
-
-```
-
-```{r, fig.width=13}
-library(GGally)
-# add y label - percent of total pop over 15 employed
-occ_names <- c("Region", "gender", "Agr./Fishing", "Pub. Works", "Education/Health/Admin", "Manufacturing", "Mines/Energy", 
-          "Other Serv.", "Trade", "Transport", "Undeclares")
-names(occupation) <- occ_names
-ggparcoord(occupation, columns = 3:11, alphaLines = .5,
-           scale = "uniminmax", splineFactor = 10, groupColumn = 2) + 
-  geom_vline(xintercept = 2:9, color = "lightblue") +
-    ggtitle("Gender Disparity by Industry",
-          subtitle = "Year: 2014") +
-  labs(x = "Industry", y= "Percent employed", caption = "Source: L'Institut National de la Statistique (INS)") +
+# Plot of Luminosity by Governorate by Year
+ggplot(lum, aes(x = year, y = mean, colour=NAME_1)) +
+geom_line() +
+xlab("Year") +
+ylab("Luminosity (watts/cm\u00b2)") +
+labs(color='Governorate', caption = "Source: L'Institut National de la Statistique (INS)") +
+    ggtitle("Luminosity by Governorate by Year",
+          subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
   theme(plot.caption = element_text(color = "grey68"))
+```
+
+Comments:
+- tunis obviously
+- and the middle ones - why near one another
+
+For a frame of reference, see appendix with graph of high, medium and low luminositites
+
+
+
+```{r message = FALSE, warning = FALSE}
+tun <- lum %>% 
+   group_by(year) %>%                         
+   summarise(count = sum(count), sum = sum(sum))
+   
+tunisia_economy <- read_csv("../data/intermediate/tunisia_economy.csv")
+tunisia <- merge(tun,tunisia_economy,by="year")
+
+tunisia$avg_lum <- tunisia$sum / tunisia$count
+
+melt_tunisia <- melt(tunisia,id="year")
+
+melt_tunisia <- melt_tunisia %>%
+      group_by(variable) %>%
+      arrange(year) %>%
+      mutate(indexedvalue = 100 * value / first(value))
+
+ggplot(subset(melt_tunisia, variable %in% c("avg_lum", "govt_debt", "gdp_per_capita", "gdp_growth", "inflation", "unemployment_rate")),
+       aes(x=year,
+       y=indexedvalue,
+       color=variable, group = variable))+
+  geom_line() + ggtitle("Indexed Economic Indicators for Tunisia", subtitle = "1992 - 2013") +xlab("Year") + ylab("Indexed Value") + labs(color='Variable', caption = "Source: L'Institut National de la Statistique (INS)") + 
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+  theme(plot.caption = element_text(color = "grey68"))
+```  
+
+Comments:
+- maybe push this to conclusion
+- maybe rename variables
+- more from Namson
+
+```{r}
+cor_tunisia <- cor(tunisia)
+cor_tunisia
+```
+
+```{r}
+ggplot(data = tunisia, mapping = aes(x = year)) + 
+  geom_line(aes(y = avg_lum), color = "blue", size = 1.5, alpha = .5) + 
+  geom_line(aes(y = gdp_ppp), color = "yellow", size = 1.5, alpha = .5) +
+              theme(legend.position=c(.1,.85))			  
+```
+
+```{r}
+ggplot(data = tunisia, mapping = aes(x = year)) + 
+  geom_line(aes(y = avg_lum), color = "blue", size = 1.5, alpha = .5) + 
+  geom_line(aes(y = gdp_growth), color = "green", size = 1.5, alpha = .5) +
+              theme(legend.position=c(.1,.85))		         
+```
+
+```{r}
+ggplot(data = tunisia, mapping = aes(x = year)) + 
+  geom_line(aes(y = avg_lum), color = "blue", size = 1.5, alpha = .5) + 
+  geom_line(aes(y = govt_debt), color = "red", size = 1.5, alpha = .5) +
+              theme(legend.position=c(.1,.85))		         
 ```
 
 
@@ -443,4 +526,15 @@ g_dot_facet <- ggplot(leisure_tidy, aes(x = leisure_household,
     ggtitle("Leisure Resources per Household")
 
 g_dot_facet + facet_wrap(~leisure_type, ncol=1)
+```
+
+```{r}
+# Subset of Data
+ggplot(subset(lum, NAME_1 %in% c("Tunis", "Sfax", "Monastir", "Tataouine")),
+       aes(x=year,
+       y=mean,
+       color=NAME_1, group = NAME_1))+
+  geom_line() +
+ylab("Luminosity") +
+ggtitle("Luminosity of Four Governorates by Year") + labs(color='Governorate') 
 ```
