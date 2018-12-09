@@ -12,6 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(reshape2)
+library(scales)
 ```
 
 ```{r 3}
@@ -59,17 +60,19 @@ cor_tunisia <- cor(tunisia)
 cor_tunisia
 
     ggplot(data = tunisia, mapping = aes(x = year)) + 
-  geom_line(aes(y = avg_lum), color = "blue", size = 1.5, alpha = .5) + 
-  geom_line(aes(y = gdp_ppp), color = "yellow", size = 1.5, alpha = .5) +
+  geom_line(aes(y = scales::rescale(avg_lum)), color = "blue", size = 1.5, alpha = .5) + 
+  geom_line(aes(y = scales::rescale(gdp_ppp)), color = "yellow", size = 1.5, alpha = .5) +
               theme(legend.position=c(.1,.85))			  
 
 
     ggplot(data = tunisia, mapping = aes(x = year)) + 
-  geom_line(aes(y = avg_lum), color = "blue", size = 1.5, alpha = .5) + 
-  geom_line(aes(y = gdp_growth), color = "green", size = 1.5, alpha = .5) +
+  geom_line(aes(y = scales::rescale(avg_lum)), color = "blue", size = 1.5, alpha = .5) + 
+  geom_line(aes(y = scales::rescale(gdp_growth)), color = "green", size = 1.5, alpha = .5) +
               theme(legend.position=c(.1,.85))		         
-              
+```
+```{r}
     ggplot(data = tunisia, mapping = aes(x = year)) + 
-  geom_line(aes(y = avg_lum), color = "blue", size = 1.5, alpha = .5) + 
-  geom_line(aes(y = govt_debt), color = "red", size = 1.5, alpha = .5) +
+  geom_line(aes(y = rescale(avg_lum)), color = "blue", size = 1.5, alpha = .5) + 
+  geom_line(aes(y = rescale(govt_debt)), color = "red", size = 1.5, alpha = .5) +
               theme(legend.position=c(.1,.85))		
+```
