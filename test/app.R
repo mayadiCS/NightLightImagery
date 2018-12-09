@@ -20,9 +20,9 @@ ui <- fluidPage(
       sidebarPanel(
          sliderInput("bins",
                      "Number of bins:",
-                     min = 1,
-                     max = 50,
-                     value = 30)
+                     min = 1992,
+                     max = 2013,
+                     value = 1)
       ),
       
       # Show a plot of the generated distribution
@@ -37,11 +37,20 @@ server <- function(input, output) {
    
    output$distPlot <- renderPlot({
       # generate bins based on input$bins from ui.R
-      x    <- faithful[, 2] 
-      bins <- seq(min(x), max(x), length.out = input$bins + 1)
+      lumData <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
+      lumData2013 <- lumData[lumData$year == input$bins,]
       
-      # draw the histogram with the specified number of bins
-      hist(x, breaks = bins, col = 'darkgray', border = 'white')
+      
+      
+      # x    <- faithful[, 2] 
+      # bins <- seq(min(x), max(x), length.out = input$bins + 1)
+      # 
+      # # draw the histogram with the specified number of bins
+      # hist(x, breaks = bins, col = 'darkgray', border = 'white')
+      
+      ggplot(lumData2013, aes(x = mean, y = fct_reorder(NAME_1, mean))) +
+        geom_point(color = "blue") + ylab("") +
+        ggtitle("Luminosity per Governovates in 2013 (mean)")
    })
 }
 
