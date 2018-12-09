@@ -15,6 +15,7 @@ Note: the term "Governorate" refers to the 24 *Counties* that devide the country
 library(ggplot2)
 library(tidyverse)
 library(reshape)
+library(choroplethrAdmin1)
 ```
 
 While the focus in this question will be the 'unemployment' variable, let us first explore our dataset.
@@ -149,11 +150,11 @@ It is also worth noting that the capital (which encompasses the Governorates of 
 
 ```{r}
 lumData <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
-lumData$Gov_longName <- lumData$NAME_1
-lumData$Gov_longName <- sub("^", "Governorate of ", lumData$Gov_longName)
-lumData$Gov_longName <- ifelse(lumData$NAME_1 == "Kebili", "Governorate of Kebili", 
-                               ifelse(,)
-                               ,"NA")
+# lumData$Gov_longName <- lumData$NAME_1
+# lumData$Gov_longName <- sub("^", "Governorate of ", lumData$Gov_longName)
+# lumData$Gov_longName <- ifelse(lumData$NAME_1 == "Kebili", "Governorate of Kebili", 
+#                                ifelse(,)
+#                                ,"NA")
 tbl_df(lumData)
 
 ```
@@ -349,7 +350,7 @@ admin1_region_choropleth(df)
 ### ChoroplethrAdmin1
 ```{r}
 # see https://arilamstein.com/creating-administrative-level-1-maps/
-library(choroplethrAdmin1)
+
 head(get_admin1_countries())
 head(get_admin1_regions("tunisia"))
 admin1_map("tunisia")
@@ -400,5 +401,17 @@ statebins(df_illit, value_col="Illiteracy",
   ggtitle("State Illiteracy Rates, 1977") +
   theme_statebins()
 ```
+
+```{r}
+tidyLum13 <- lumData2013 %>% select(NAME_1, mean)
+tidyLum13 <- filter(tidyLum13, !NAME_1 %in% c("Ariana"))
+tidyLum13$NAME_1 <- c("gouvernorat de kebili","gouvernorat de kef","gouvernorat de mahdia","gouvernorat de la manouba","gouvernorat de medenine","gouvernorat de monastir","gouvernorat de nabeul","gouvernorat de sfax","gouvernorat de sidi bou zid","gouvernorat de siliana","gouvernorat de sousse","gouvernorat de beja","gouvernorat de tataouine","gouvernorat de tozeur","gouvernorat de tunis","gouvernorat de zaghouan","gouvernorat de ben arous","gouvernorat de bizerte","gouvernorat de gabes","gouvernorat de gafsa","gouvernorat de jendouba","gouvernorat de kairouan","gouvernorat de kasserine")
+
+df = data.frame(region=tidyLum13$NAME_1, value=as.numeric(as.character(tidyLum13$mean)))
+
+admin1_region_choropleth(df) 
+```
+c("gouvernorat de kebili","gouvernorat de kef","gouvernorat de mahdia","gouvernorat de la manouba","gouvernorat de medenine","gouvernorat de monastir","gouvernorat de nabeul","gouvernorat de sfax","gouvernorat de sidi bou zid","gouvernorat de siliana","gouvernorat de sousse","gouvernorat de beja","gouvernorat de tataouine","gouvernorat de tozeur","gouvernorat de tunis","gouvernorat de zaghouan","gouvernorat de ben arous","gouvernorat de bizerte","gouvernorat de gabes","gouvernorat de gafsa","gouvernorat de jendouba","gouvernorat de kairouan","gouvernorat de kasserine")
+
 
 
