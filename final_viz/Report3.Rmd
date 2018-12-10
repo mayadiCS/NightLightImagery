@@ -626,6 +626,19 @@ This graph shows one of our most interesting findings.  Its comparing luminosity
 
 ## (6) Interactive component
 
+Since our report provides detailed plots pertaining to economic factors, we wanted our interactive component of the project to focus on visualizing data that is hard to map at once; that is luminosity over time. For instance, trying to facet graphs covering 22 years worth of data is visually cumbersome. Instead, we are giving our user the liberty to explore luminosity using a slider. We specifically chose the variable, luminosity, as it is the central and more importantly the novel piece in our report. Producing luminosity data required us to process NASA satellite imagery as the information is, as of now, not readily available.
+
+Shiny App URL:
+
+https://nightlight.shinyapps.io/TunisiaNightLightOverTime/
+
+You may also visualize an animation of the original nightlight satellite imagery via the below link. Because it is hard to discern the subtle differences from year to year from the satellite images, we decided to instead create a fast looping GIF to better represent contrast.
+https://github.com/mariemayadi/data/blob/master/luminosityOverTimeTunisia.gif
+
+Note:
+The app is experiencing some latency issues. We apologize for the inconvenience.
+
+
 ## (7) Conclusion
 
 - Interested in looking at 2011 (year of the jasmine revolution) sicne the GDP went drastically down (Maybe less economic activity? Look into lumnisity?)
