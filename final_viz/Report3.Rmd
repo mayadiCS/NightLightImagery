@@ -202,8 +202,10 @@ boxplot(del_sfax$`2013_mean`, horizontal = TRUE, main = "Luminosity of Sfax Dele
 stripchart(del_sfax$`2013_mean`, col = "blue", pch = 21, add = TRUE, method = "jitter")
 ```
 
+To further examine the unusually low value of mean luminosity for the governorate of Sfax, we decided to examine it at a higher level of spatial granularity. We grouped the delegation level data for all 16 delegations within Sfax to gain a better understanding of its low mean luminosity value.  After examining the distribution with a boxplot and jittering the points to add visibility, it became clear that the distribution of mean delegation luminosity is largely clustered around a value of around 10/63, but has a very long tail going to the right with two delegations having values of nearly 63. Our hypothesis was that these two delegations represent the city of Sfax, which is a major port city with a large population.  However, because these areas are very small and the governorate as a whole is large, the mean luminosity value is dragged much lower by these other more rural delegations. This was confirmed in the following plot which shows the values for each delegation within Sfax by name. 
+
 ```{r}
-ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
+ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`2013_mean`)) +
   geom_boxplot() +
   geom_jitter(alpha = 0.2, width = 0.1, color = "#926d25") +
   coord_flip() +labs(y = "Luminosity (mean)", x = "Sfax delegation") +
@@ -215,12 +217,6 @@ ggplot(del_sfax, aes(del_sfax$NAME_2, del_sfax$`1992_mean`)) +
   theme(plot.caption = element_text(color = "grey68"))
 ```
 
-Comments:
-- Clear unbalance between delegations within the Sfax governorates. The outliers are: xxx and YYY.
-
-
-What might explain such variation in luminosity?
-- a little more
 
 ### (4.f) Exploring potential covariates of luminosity
 
