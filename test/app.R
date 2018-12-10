@@ -1,4 +1,12 @@
 library(shiny)
+library(choroplethr)
+library(choroplethrAdmin1)
+library(choroplethrMaps)
+library(choroplethrZip)
+library(tidyverse)
+library(here)
+
+library(rsconnect)
 
 ui <- fluidPage(
   
@@ -29,7 +37,8 @@ server <- function(input, output) {
    
    output$dotplot <- renderPlot({
       # generate bins based on input$bins from ui.R
-      lumData <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
+      ##lumData <- read_csv(here("tun_lum_governorate_93_13_tidy.csv")) 
+      lumData <- read.csv(url("https://raw.githubusercontent.com/mariemayadi/data/master/tun_lum_governorate_93_13_tidy.csv"))
       lumData2013 <- lumData[lumData$year == input$years,]
       
       # x    <- faithful[, 2] 
@@ -45,7 +54,8 @@ server <- function(input, output) {
    
    output$mapLum <- renderPlot({
      # generate bins based on input$bins from ui.R
-     lumData <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
+     ##lumData <- read_csv(here("../  tun_lum_governorate_93_13_tidy.csv"))
+     lumData <- read.csv(url("https://raw.githubusercontent.com/mariemayadi/data/master/tun_lum_governorate_93_13_tidy.csv"))
      lumData2013 <- lumData[lumData$year == input$years,]
      
      tidyLum13 <- lumData2013 %>% select(NAME_1, mean)
