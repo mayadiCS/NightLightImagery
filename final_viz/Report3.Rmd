@@ -16,6 +16,8 @@ library(scales)
 library(png)
 library(grid)
 library(gridExtra)
+library(RColorBrewer)
+
 source(here("data_cleaning", "clean_linkage.R"))
 ```
 
@@ -452,6 +454,7 @@ lum <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
 # Plot of Luminosity by Governorate by Year
 ggplot(lum, aes(x = year, y = mean, colour=NAME_1)) +
 geom_line() +
+
 xlab("Year") +
 ylab("Luminosity (watts/cm\u00b2)") +
 labs(color='Governorate', caption = "Source: L'Institut National de la Statistique (INS)") +
@@ -590,9 +593,13 @@ This graph showed that while the same 3 governorates (Tunis, Monastir and Ben Ar
 After learning these lessons about Tunisia, we shifted our focus to the luminosity data:
 
 ```{r warning=FALSE, message=FALSE}
-# Plot of Luminosity by Governorate by Year
-ggplot(lum, aes(x = year, y = mean, colour=NAME_1)) +
+# Plot of Luminosity by Governorate by Years
+#subset(lum, NAME_1 %in% c("Tunis", "Sfax", "Monastir", "Tataouine")
+ggplot(subset(lum, NAME_1 %in% c("Tunis", "Sfax", "Monastir", "Tataouine", "Le Kef", "Sidi Bou Zid", "Mèdenine", "Nabeul", "Ariana",
+                                 "Ben Arous (Tunis Sud)")),
+       aes(x = year, y = mean, colour=NAME_1)) +
 geom_line() +
+scale_colour_brewer(palette="Set3") +
 xlab("Year") +
 ylab("Luminosity (watts/cm\u00b2)") +
 labs(color='Governorate', caption = "Source: L'Institut National de la Statistique (INS)") +
@@ -603,7 +610,7 @@ labs(color='Governorate', caption = "Source: L'Institut National de la Statistiq
   theme(plot.caption = element_text(color = "grey68"))
 ```
 
-While a number of factors make it difficult for us to make year-to-year comparisons for satellite luminosity data, from this chart we can observe the following:
+This shows luminosity data over time for several select governorates. While a number of factors make it difficult for us to make year-to-year comparisons for satellite luminosity data, from this chart we can observe the following:
 
 - Tunis, as would be expected from its high levels of population density and consumption per capita, has the highest levels of luminosity by a wide margin. Population density and consumption per capita also seem to generally be relatively good predictors of luminosity.
 - Luminosity collected in this manner and viewed as a time series is noisy. In general it trends upwards over time, but the relationship isn't smooth and simple.  The sharp changes from year to year are difficult to attribute a definite source to.
