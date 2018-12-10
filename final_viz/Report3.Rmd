@@ -34,7 +34,7 @@ grid.arrange(img1992, img2013, ncol = 2)
 
 Visit the following link to view a year by year animation of nightlight imagery from 1992 to 2013:
 
-https://raw.githubusercontent.com/mariemayadi/data/master/tun_lum_governorate_93_13_tidy.csv 
+https://github.com/mariemayadi/data/blob/master/luminosityOverTimeTunisia.gif
 
 ### Why we chose this topic
 
