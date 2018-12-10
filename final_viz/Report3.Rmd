@@ -175,9 +175,9 @@ tidyConsump15$Governorates <- c("gouvernorat de tunis", "gouvernorat de ben arou
 
 #as.numeric(as.character(exitDF$immigrant))
 
-df = data.frame(region=tidyConsump15$Governorates, value=as.numeric(as.character(tidyConsump15$Consumption)))
+df = data.frame(region=tidyConsump15$Governorates, value=as.numeric(as.character(tidyConsump15$Consumption)) / 1000000)
 
-admin1_region_choropleth(df, legend = "Consumption by Tunisian Dinar (TND)") +
+admin1_region_choropleth(df, legend = "Consumption by Millions of Tunisian Dinar (TND)") +
   ggtitle("Consumption by Governorate",
           subtitle = "Year: 2015") +
   labs(caption = "Source: L'Institut National de la Statistique (INS)") +
@@ -557,8 +557,72 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
 Finally, the negative relationship between government debt and luminosity can be seen in this graph. From 1992 to 2000, normalized government debt is high while normalized luminosity is low. From 2000 onwards, government debt begins to steadily decrease until 2011 when it sharply spikes again. Luminosity generally seems to climb over this timespan, but again in a very non-linear way. Overall, it is clear from these graphs that even as luminosity generally increases over time, it fluctuates wildly from year to year, much more so than other, more official economic indicators that are measured across time.
 
 
- 
 ## (5) Executive summary (Presentation-style)
+
+We began this project with the intention of exposing a connection between luminosity in nighttime satellite images and economic attributes within the country of Tunisia.  We decided to look at the country both as a whole and by governorate, an administrative boundary which serves a similar function as a state in the United States. We began by examining how these governorates differ from one another.  The first thing we chose to examine was population density. We had a hypothesis that more densely populated governorates would have higher luminosity, so we wanted to identify which governorates to focus on for these analyses. 
+
+```{r message=FALSE, warning=FALSE}
+admin1_choropleth("tunisia", density, num_colors = 7, title = "Population Density", legend = "Population Density (km\u00b2)") +
+  ggtitle("Tunisia's Population Density by Governorate",
+          subtitle = "Year: 2014") +
+  labs(caption = "Source: L'Institut National de la Statistique (INS)") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+  theme(plot.caption = element_text(color = "grey68"))
+```
+
+This graph gave us our first indications that if luminosity and population density are inter-related like we hypothesized that we may want to pay special attention to governorates in coastal regions, which tend to have a higher population density.
+
+The other variable we expected to be strongly correlated with luminosity is consumption per capita.  Consumption measures how much money people are spending, and is an indicator of a strong economy.
+
+```{r message=FALSE, warning=FALSE}
+admin1_region_choropleth(df, num_colors= 1, legend = "Consumption by Millions of Tunisian Dinar (TND)") +
+  ggtitle("Consumption by Governorate",
+          subtitle = "Year: 2015") +
+  labs(caption = "Source: L'Institut National de la Statistique (INS)") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+  theme(plot.caption = element_text(color = "grey68"))
+```
+
+This graph showed that while the same 3 governorates (Tunis, Monastir and Ben Arous) have the highest values of both consumption per capita and population density, there are some differences. A few larger coastal governorates have low consumption levels and a few larger, low population density landlocked governorates have high rates of consumption per capita.
+
+After learning these lessons about Tunisia, we shifted our focus to the luminosity data:
+
+```{r warning=FALSE, message=FALSE}
+# Plot of Luminosity by Governorate by Year
+ggplot(lum, aes(x = year, y = mean, colour=NAME_1)) +
+geom_line() +
+xlab("Year") +
+ylab("Luminosity (watts/cm\u00b2)") +
+labs(color='Governorate', caption = "Source: L'Institut National de la Statistique (INS)") +
+    ggtitle("Luminosity by Governorate by Year",
+          subtitle = "1992 - 2013") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+  theme(plot.caption = element_text(color = "grey68"))
+```
+
+While a number of factors make it difficult for us to make year-to-year comparisons for satellite luminosity data, from this chart we can observe the following:
+
+- Tunis, as would be expected from its high levels of population density and consumption per capita, has the highest levels of luminosity by a wide margin. Population density and consumption per capita also seem to generally be relatively good predictors of luminosity.
+- Luminosity collected in this manner and viewed as a time series is noisy. In general it trends upwards over time, but the relationship isn't smooth and simple.  The sharp changes from year to year are difficult to attribute a definite source to.
+- All the governorates generally seem to be subject to these sharp yearly changes in very similar ways.
+
+Our final aim was to draw a connection between economic indicators and luminosity in Tunisia:
+
+```{r}
+ggplot() + 
+geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=1.5, alpha =.5)+
+  geom_line(data=tunisia,aes(y = rescale(govt_debt), x=year,colour="red"),size=1.5, alpha =.5)+
+  scale_color_discrete(name = "Normalized Variable", labels = c("Luminosity", "Government Debt")) + 
+  ggtitle("Luminosity vs. Government Debt in Tunisia (Normalized)", subtitle = "1992 - 2013") +
+  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value") + labs(color='Normalized Value', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")			  
+```
+
+This graph shows one of our most interesting findings.  Its comparing luminosity (watts/ cm<sup>2</sup>) and government debt (TND), with both values scaled from 0 to 1 to show effects despite the two being on different scales. While difficult to be sure of due to noisy luminosity data, we see a definite inverse relationship between luminosity and government debt.  We suspect that this is because as the government goes into more debt, it invests more money in resources and infrastructure which ultimately increase luminosity. 
 
 ## (6) Interactive component
 
