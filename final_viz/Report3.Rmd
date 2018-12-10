@@ -439,11 +439,13 @@ melt_tunisia <- melt_tunisia %>%
       arrange(year) %>%
       mutate(indexedvalue = 100 * value / first(value))
 
+
 ggplot(subset(melt_tunisia, variable %in% c("avg_lum", "govt_debt", "gdp_per_capita", "gdp_growth", "inflation", "unemployment_rate")),
        aes(x=year,
        y=indexedvalue,
        color=variable, group = variable))+
-  geom_line() + ggtitle("Indexed Economic Indicators for Tunisia", subtitle = "1992 - 2013") +xlab("Year") + ylab("Indexed Value") + labs(color='Variable', caption = "Source: L'Institut National de la Statistique (INS)") + 
+  geom_line() + ggtitle("Indexed Economic Indicators for Tunisia", subtitle = "1992 - 2013") +
+  scale_color_discrete(name = "Variable", labels = c("GDP Growth Rate", "GDP per capita (PPP)", "Inflation Rate", "Unemployment Rate", "Government Debt", "Luminosity")) + xlab("Year") + ylab("Indexed Value") + labs(color='Variable', caption = "Source: L'Institut National de la Statistique (INS)") + 
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
   theme(plot.caption = element_text(color = "grey68"))
@@ -468,10 +470,10 @@ The correlation of luminosity with total GDP is 0.75 and with GDP per capita is 
 Of particular interest is that the relationship between luminosity and government debt is very strong in the negative direction (-0.66). A possible explanation for this is that higher levels of government debt are associated with the economy not doing well, and thus there is less luminosity to be observed.
 
 ```{r}
-ggplot(data = tunisia, mapping = aes(x = year)) + 
-  geom_line(aes(y = scales::rescale(avg_lum)), color = "blue", size = 1.5, alpha = .5) + 
-  geom_line(aes(y = scales::rescale(gdp_ppp)), color = "yellow", size = 1.5, alpha = .5) +
-              theme(legend.position=c(.1,.85)) +
+ggplot() + 
+geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=1.5, alpha =.5)+
+  geom_line(data=tunisia,aes(y = rescale(gdp_ppp), x=year,colour="red"),size=1.5, alpha =.5)+
+  scale_color_discrete(name = "Normalized Variable", labels = c("Luminosity", "GDP per capita (PPP)")) +
     ggtitle("Luminosity vs. GDP per capita (PPP) in Tunisia (Normalized)",
           subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
@@ -482,11 +484,11 @@ ggplot(data = tunisia, mapping = aes(x = year)) +
 This graph shows the normalized relationship between the level of luminosity and GDP per capita PPP in Tunisia from 1992 to 2013. While the correlation between the two measures is 0.74 and both show an overall upward trend during the given time interval, we can see that GDP per capita (PPP) is a relatively stable measure, while the level of luminosity wildly fluctuates from year to year. This suggests that GDP per capita is a more reliable measure of economic activity compared to the level of luminosity. 
 
 ```{r}
-ggplot(data = tunisia, mapping = aes(x = year)) + 
-  geom_line(aes(y = scales::rescale(avg_lum)), color = "blue", size = 1.5, alpha = .5) + 
-  geom_line(aes(y = scales::rescale(gdp_growth)), color = "green", size = 1.5, alpha = .5) +
-              theme(legend.position=c(.1,.85))	+
-    ggtitle("Luminosity vs. GDP Growth in Tunisia (Normalized)",
+ggplot() + 
+geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=1.5, alpha =.5)+
+  geom_line(data=tunisia,aes(y = rescale(gdp_growth), x=year,colour="orange"),size=1.5, alpha =.5)+
+  scale_color_discrete(name = "Normalized Variable", labels = c("Luminosity", "GDP Growth Rate")) +
+    ggtitle("Luminosity vs. GDP Growth Rate in Tunisia (Normalized)",
           subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
@@ -496,12 +498,11 @@ ggplot(data = tunisia, mapping = aes(x = year)) +
 Recall that luminosity and GDP growth have a slightly negative relationship (-0.38). This may provide some evidence for the theory of economic convergence, namely that poorer regions (that we assume to be lower in luminosity) grow at faster rates than more developed regions. This graph of the relationship between the two variables shows that when normalized luminosity is low, normalized gdp growth tends to be high and vice versa; observe the time ranges of 1995-2000, 2003 to 2008, and 2011-2013 to see this trend.
 
 ```{r}
-ggplot(data = tunisia, mapping = aes(x = year)) + 
-  geom_line(aes(y = rescale(avg_lum)), color = "blue", size = 1.5, alpha = .5) + 
-  geom_line(aes(y = rescale(govt_debt)), color = "red", size = 1.5, alpha = .5) +
-              theme(legend.position=c(.1,.85))	 +
-    ggtitle("Luminosity vs. Government Debt in Tunisia (Normalized)",
-          subtitle = "1992 - 2013") +
+ggplot() + 
+geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=1.5, alpha =.5)+
+  geom_line(data=tunisia,aes(y = rescale(govt_debt), x=year,colour="red"),size=1.5, alpha =.5)+
+  scale_color_discrete(name = "Normalized Variable", labels = c("Luminosity", "Government Debt")) + 
+  ggtitle("Luminosity vs. Government Debt in Tunisia (Normalized)", subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
   theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value")			  
