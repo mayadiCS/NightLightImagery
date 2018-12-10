@@ -22,11 +22,6 @@ source(here("data_cleaning", "clean_linkage.R"))
 ```
 
 ## (1) Introduction
-- map of tunisia
-- star wars
-- hannibal
-- colesium
-- lack of usage of alternative data in the developing world
 
 ```{r}
 img1992 <-  rasterGrob(as.raster(readPNG("../data/final/wYears/map_1992.png")), interpolate = FALSE)
@@ -40,7 +35,7 @@ https://github.com/mariemayadi/data/blob/master/luminosityOverTimeTunisia.gif
 
 ### Why we chose this topic
 
-We are studying how effective luminosity is as a predictor of economic activity in Tunisia. The primary reason for choosing this topic is to attempt to take a first step at filing a substantial gap in research. Many countries today, especially from the developing world, rely primarily on sporadic survey data such as the one conducted by the World Bank to produce their research. These surveys are not only sparse (they are rarely conducted on a yearly basis) but also expensive and at times not very granular. Another issue is the reliability of survey data. Depending on which organism is responsible to produce the data, the output might include inaccuracies. Our proposed alternative, which we document in detail in our report, is to convert NASA’s Nightlight Satellite Imagery into a luminosity value. The data is (1) publicly available, (2) has been measured on a yearly basis (as well as on a more granular time scale in some cases) for at least 20 years, and (3) covers almost the entire inhabitable earth. 
+We are studying how effective luminosity is as a predictor of economic activity in Tunisia. The primary reason for choosing this topic is to attempt to take a first step at filing a substantial gap in research. Many countries today, especially from the developing world, rely primarily on sporadic survey data such as the one conducted by the World Bank to produce their research. These surveys are not only sparse (they are rarely conducted on a yearly basis) but also expensive and at times not very granular. Another issue is the reliability of survey data. Depending on which organisation is responsible to produce the data, the output might include inaccuracies. Our proposed alternative, which we document in detail in our report, is to convert NASA’s Nightlight Satellite Imagery into a luminosity value. The data is (1) publicly available, (2) has been measured on a yearly basis (as well as on a more granular time scale in some cases) for at least 20 years, and (3) covers almost the entire inhabitable earth. 
 
 
 ### Questions we are interested in studying
@@ -76,16 +71,44 @@ The work was evenly split between our three team members: Jesse P Cahill, Mariem
 - Planet didn’t provide large enough coverage eg. at the country level
 - Many sources for satellite imagery
 
+### Satellite Data
+Satellite data was collected from the National Oceanic and Atmospheric Administration (NOAA) Version 4 DMSP-OLS Nighttime Lights Time Series. The data is located at https://ngdc.noaa.gov/eog/dmsp/downloadV4composites.html  The images are cloud-free composites made using all the available archived DMSP-OLS smooth resolution data for calendar years 1992 through 2013. In some years two separate satellites were collecting data, and in those years we defaulted to the images from the older satellite. We downloaded the compressed versions of these files as geotiffs and loaded them into QGIS as 13 individual raster layers.  The images are originally very dark so not much data is apparent on the standard brightness scale of 0 as black and 255 as maximum brightness. To rectify this the images were rescaled from 0 to 63 by the provider prior to downloading, thus making differences in luminosity more visually apparent.
+
+Our goal of examining differences in data by Tunisian governorate required us to obtain summary statistics for each individual governorate from every raster image. This was obtained by imposing a vector layer of polygons making up each governorate on top of the raster satellite images in the form of a shapefile, which was loaded into QGIS.  The shapefile was sourced from GADM, the Database of Global Administrative Areas.  We used shapefiles for both governorates (analogous to a U.S. State) and delegations (analogous to a U.S. county).
+
+We then used the QGIS zonal statistics tool to gather aggregated luminosity data for each of the 24 governorates and the 264 delegations for each year’s satellite images. The zonal statistics tool works by treating each pixel value within each geographic unit designated from the shapefile as a separate datum and each geographic unit as a separate dataset. Summary statistics are then computed based on those data values.  We are most interested in the following statistics:
+
+- **Count**: Total count of the number of pixels within the geographic unit.  Because each pixel has a set area, this can be used as a proxy for geographic unit area.
+- **Sum**: Total sum of all pixel values within the geographic unit.
+- **Mean**: Sample mean of all pixel values within the geographic unit.  This is our most used summary statistic and our primary means of comparing the luminosity between governorates, as it is not dependent on area.
+- **Variance**: Sample variance of all pixel values within the geographic unit.  We believe this can be used to identify governorates that are small and very uniformly lit (which should have lower variance) from governorates that have some highly lit areas and other very dark areas, even though the two may have similar mean luminosity.
+
+### Economic Data
+Most economic statistics were collected from the Tunisia Data Portal at http://dataportal.ins.tn/en/. This website is run by the L'Institut National de la Statistique (INS) of Tunisia. We were primarily interested in governorate-level data as opposed to national-level accounts, as we wanted to study within-country variation in luminosity and economic activity. We chose to focus on Tunisian economic data from 2014 because studies have indicated that luminosity is a better indicator for cross-sectional as opposed to panel/time-series data (Chen 2010). The data came from the Tunisia’s government 2014 Census.
+
+We were able to download csv files of statistical data for variables such as households by possession of leisure resources and Information and Communication Technologies (ICT’s), access to public services, and workers in particular industries (e.g. agriculture, manufacturing, mining). We then selected a few indicators that we believed were relevant to the comparison of luminosity to economic variables. Finally, we did some minor formatting changes of the csv files such as renaming variables and sorting rows and columns before exporting them into R for visualization and analysis.
+
+We also collected some national-level time-series economic data for Tunisia from the IMF World Economic Outlook Database. These variables were total GDP, GDP per capita, GDP growth, inflation, unemployment rates, and government debt from 1992 until 2013 and were used in comparison to national-level measures of luminosity in our project.This data is mostly self-explanatory and easy to access at this link: https://www.imf.org/external/pubs/ft/weo/2018/01/weodata/weorept.aspx?pr.x=96&pr.y=0&sy=1980&ey=2023&scsm=1&ssd=1&sort=country&ds=.&br=1&c=744&s=NGDP_RPCH,PPPGDP,PPPPC,PCPIPCH,LUR,GGXWDG_NGDP&grp=0&a=
 
 ## (3) Analysis of data quality
 
-Some of the variable names are unclear, probably due to shoddy translation (i.e. what is the diff between ‘Number of households having drinking water from the public source or source of water association’ and ‘Number of households having drinking water from the other public or private source’?
-- translation
-- stata
+### Satellite Data
+There are some concerns in general using longitudinal cloud-free composite images for luminosity data. Additional variance can be introduced because these images are created from many images taken over the year to avoid luminosity being obscured by cloud coverage.  Additionally, not all photos are taken using the same satellite. Six separate satellites are used over the 21 years that make up our dataset, and our literature search indicated that there can often be significant differences in the values observed by different satellites.  This can be observed in the time-series graph of average luminosity across Tunisia, where we often see sharp jumps in years when a new satellite is introduced.
+
+The spatial resolution of raster satellite images is also slightly lower than could be desired.  When viewing graphs in QGIS, occasionally the Tunisia governorate shapefile wouldn’t match up perfectly with the borders of the country, and would move between years.  With our limited GIS software knowledge we weren’t able to address this issue, and although minor it is possible there could have been a small effect on the data.
+
+Luckily, due to the nature of the data processing we had no NA’s in satellite data, as every pixel is assigned a value without fail.    
+
+
+### Economic Data
+Because we had to download individual files for each topic of the census, our economic data is a bit fragmented between different files. For example, there are separate spreadsheets for ‘households by possession of ICT’s’, ‘households by possession of leisure resources’ and ‘households by households by sources of supply of drinking water”. Nevertheless the economic data appeared to be complete and accurate for the indicators that were provided. There was no missing data for any variable that we used for our project.
+
+In addition, there were no circumstances in which we looked through the data and thought that there was something off about the numbers. Rich areas had more leisure resources, governorates with more population had higher total number of households, and so forth.
+
+The biggest challenge with the economic data was that the definitions of the variables were often vaguely defined, which made us unsure of how to incorporate them into our analysis. For example, one variable as defined as ‘Number of household owning a Parable’, which was NOT the number of households that had a moral lesson to tell us, but rather the number of households that owned a dish antenna. We suspected that some of these shoddy definitions came down to meaning being lost in translation, given that Tunisia is an Arabic and French-speaking country. Overall our approach was simply to prioritize those variables that (1) had to do with luminosity (2) were more clearly defined to incorporate into our analysis.
+
 
 ## (4) Main analysis (Exploratory Data Analysis)
-
-Extensive data processing
 
 ### (4.a) A First Look at Tunisia
 
@@ -647,14 +670,16 @@ The app is experiencing some latency issues. We apologize for the inconvenience.
 
 
 ## (7) Conclusion
+We chose to perform this analysis on Tunisia rather than the United States or any other country because as a group we were inspired by our teammate’s personal connection to the country.  Although historically there has been work done to connect luminosity data to economic indicators, places like Tunisia and its neighbors too often go ignored in 
+these types of analyses.
 
-- Interested in looking at 2011 (year of the jasmine revolution) sicne the GDP went drastically down (Maybe less economic activity? Look into lumnisity?)
-- Time series of luminosity per governorate
-- !! Make a comment about coastal governorates
-- https://academic.oup.com/eurpub/article/24/suppl_1/6/560448 - info on Choucha refugee crisis and 20% increase in Medeneine population
-- Challenge: choroplethr naming for governorates is very specific and does not support french accent”. Two regions are missing.
-- Bin side - looked into curtomizing it but very time consuming 
+As one would be expect, mean luminosity over the country in general increased over time from 1992 to 2013.  However, due to the satellite data limitations discussed above, the trend is subject to sudden changes that may or may not reflect actual luminosity changes.  This makes it difficult to look at luminosity longitudinally. 
 
+Perhaps the largest connections between luminosity and other data were made based on consumption per capita (a measure of economic activity) and geographic location. Coastal governorates tend to have higher consumption and luminosity.  This is likely because these governorates contain established port cities such as Tunis and Sfax, where trade brings in money and increases consumption. We believe this is the primary driving force behind luminosity.
+
+With that being said, there was is a lot of data that we didn’t have time to analyze in as much depth as we’d have preferred, and some we couldn’t get to at all. We’d also have preferred to have some additional economic indicators per governorate, such as median household income.  We’d also like to do more direct comparisons between some of the data from the Tunisia Data Portal (resources, employment industry) and luminosity. And despite having many variables to explore, most of them only had data for 2014, which was after our luminosity data ended in 2013.  It would be preferable to have this data in time series format as well, so we could look at luminosity along with these variables together longitudinally.
+
+One of our most important lessons learned during the course of this project is to be skeptical of our biases and preconceived notions when analyzing a dataset, as we were often surprised by what we found.  For instance, the high rates of women working manufacturing jobs in some governorates, and the relatively high consumption of some larger more desertous governorates such as Tataouine, which was the inspiration for Luke Skywalker’s lawless backwater planet in Star Wars. We also learned how US-centric many online tools and resources can be. It is much easier to create a map of the United States than any other country using R. That being said, there are people working hard to extend resources to cover less commonly examined regions.  ChoroplethrAdmin1, despite its limitations (it is missing a governorate and doesn’t support French language well) is an incredibly useful tool. The Database of Global Administrative areas from which we sourced the shapefiles for Tunisian governorates and delegations also comes to mind. We believe that in shining a light on Tunisia in this manner we have learned several important lessons and made good use of data that perhaps doesn’t get the attention it deserves.      
 
 ## Appendix
 
