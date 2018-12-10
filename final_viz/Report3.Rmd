@@ -63,6 +63,8 @@ imgGov <-  rasterGrob(as.raster(readPNG("../img/Tunisia-governorates.png")), int
 grid.arrange(imgLoc, imgGov, ncol = 2)
 ```
 
+### Team contribution
+
 The work was evenly split between our three team members: Jesse P Cahill, Mariem Ayadi and Namson Ngo-Le. Initially, two of us teamed up to familirize ourselves with using QGis to ingest and process the NOAA sattelite imagery. Another team member focused on reading relevant research papers and extracting data from the Tunisian National Institute of Statistics (INS). At a later stage, each member was assigned a third of all of the collected input data and was tasked to create insightful exploratory graphs that would help answer our research question. As a team, we then were able to modify, integrate and create a story line around the created visuals.
 
 ## (2) Description of data
