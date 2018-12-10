@@ -13,6 +13,9 @@ library(here)
 library(zoo)
 library(reshape2)
 library(scales)
+library(png)
+library(grid)
+library(gridExtra)
 source(here("data_cleaning", "clean_linkage.R"))
 ```
 
@@ -22,6 +25,45 @@ source(here("data_cleaning", "clean_linkage.R"))
 - hannibal
 - colesium
 - lack of usage of alternative data in the developing world
+
+```{r}
+img1992 <-  rasterGrob(as.raster(readPNG("../data/final/wYears/map_1992.png")), interpolate = FALSE)
+img2013 <-  rasterGrob(as.raster(readPNG("../data/final/wYears/map_2013.png")), interpolate = FALSE)
+grid.arrange(img1992, img2013, ncol = 2)
+```
+
+Visit the following link to view a year by year animation of nightlight imagery from 1992 to 2013:
+
+https://raw.githubusercontent.com/mariemayadi/data/master/tun_lum_governorate_93_13_tidy.csv 
+
+### Why we chose this topic
+
+We are studying how effective luminosity is as a predictor of economic activity in Tunisia. The primary reason for choosing this topic is to attempt to take a first step at filing a substantial gap in research. Many countries today, especially from the developing world, rely primarily on sporadic survey data such as the one conducted by the World Bank to produce their research. These surveys are not only sparse (they are rarely conducted on a yearly basis) but also expensive and at times not very granular. Another issue is the reliability of survey data. Depending on which organism is responsible to produce the data, the output might include inaccuracies. Our proposed alternative, which we document in detail in our report, is to convert NASA’s Nightlight Satellite Imagery into a luminosity value. The data is (1) publicly available, (2) has been measured on a yearly basis (as well as on a more granular time scale in some cases) for at least 20 years, and (3) covers almost the entire inhabitable earth. 
+
+
+### Questions we are interested in studying
+
+Luminosity data has been observed to be an effective proxy for economic activity, especially in developing countries with poorer statistical systems (Chen 2010). In particular, statistical measures of nighttime lights are correlated with measured income and GDP per capita (Pinkovskiy 2014). In addition, measures of luminosity can also tell us about the access to electricity and the level of public goods provision in a given region (Michalopoulos 2012).
+
+Given that this data can be very objectively and consistently measured, has been gathered over such a long time-span, and can be measured at a very high level of geographical fineness (Henderson 2009), it is likely to be conducive to enhancing our understanding of economic activity in a given country. As Elvidge et al. put it, “Nighttime lights provide a useful proxy for development and have great potential for recording humanity’s presence on the earth’s surface and for measuring important variables such as annual growth rates for development” (Elvidge 2007). Finally, luminosity data has many useful data visualization purposes; maps of nighttime lights are both nice to look at and insightful.
+
+### Practical definitions:
+
+Tunisia is located in Northern Africa. Its capital is Tunis. The country is divided into 7 broad regions: Greater Tunis area, North East, North West, Center East, Center West, South East and South West.
+
+Each region is composed a number of governorates; in total, Tunisia has 24 Governorates. 
+(A “Governorate” is the equivalent to a “State” in the United States of America or a “Province” in Canada.
+Note: The ChoroplethrAdmin1 package provides a breakdown of Tunisia by governorates.)
+
+Furthermore, each governorate is comprised of “Delegations”. In total, Tunisia has 264 delegations.
+
+```{r}
+imgLoc <-  rasterGrob(as.raster(readPNG("../img/Tunisia-location-globe.png")), interpolate = FALSE)
+imgGov <-  rasterGrob(as.raster(readPNG("../img/Tunisia-governorates.png")), interpolate = FALSE)
+grid.arrange(imgLoc, imgGov, ncol = 2)
+```
+
+The work was evenly split between our three team members: Jesse P Cahill, Mariem Ayadi and Namson Ngo-Le. Initially, two of us teamed up to familirize ourselves with using QGis to ingest and process the NOAA sattelite imagery. Another team member focused on reading relevant research papers and extracting data from the Tunisian National Institute of Statistics (INS). At a later stage, each member was assigned a third of all of the collected input data and was tasked to create insightful exploratory graphs that would help answer our research question. As a team, we then were able to modify, integrate and create a story line around the created visuals.
 
 ## (2) Description of data
 
