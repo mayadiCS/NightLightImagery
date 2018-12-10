@@ -108,10 +108,6 @@ This plot shows one line per governorate per gender for the year 2014, with the 
 
 ### (4.c) Consumption by Governorates
 
-TODO:
-- add after map bar plot or cleveland dot plot to show ranking of governorates by consumption
-
-
 ```{r message = FALSE, warning = FALSE}
 consumption2015 <- readxl::read_xlsx("../data/intermediate/Enquête Consommation 2010 12_08_2018 10_49_06.xlsx")
 
@@ -147,14 +143,11 @@ admin1_region_choropleth(df, legend = "Consumption by Tunisian Dinar (TND)") +
 
 ```
 
-Comments:
-- definie consumption
-- can include excat categories that made up total
-- per capital
-- first comma from the right is delignating cents
-- show top 5
-- focus on sfax
+The variable consumption here is defined as the average consumption per capita of each governorate in 2015. Total consumption is a sum of the consumption of products and services such as alcohol, furniture, cultural activities, restaurants, and transportation for each governorate. The units are in the Tunisian currency dinar, and the first comma from the right is a separator for the amount of millimes and dinars (which are roughly analogous to American cents and dollars, with the difference being that 1000 millimes = 1 dinar). Thus for example the highest measure of consumption per capita in the data set is Tunis with 5,809 dinars and 925 millimes.
 
+While the wealthy coastal governorates have the highest levels of consumption per capita, there are some subtle differences from the population density choroplethr plot. Consumption is lowest in some of the inland northwest governorates, while the southern, sparsely populated governorates have relatively high levels of consumption per capita compared to the rest of the country. 
+
+Overall there appears to be a lot more economic activity in the densely populated coastal regions of Tunisia as well as disparities in industry participation by gender. Incorporating our luminosity data into our analysis should prove useful in gaining better insights into some of these subnational-level variations in economic data.
 
 
 ### (4.d) Luminosity trends across Tunisia
@@ -186,15 +179,19 @@ g <- ggplot(tidyConsump15, aes(x = Consumption, y = fct_reorder(Governorates, Co
     geom_point(color = "blue") + ylab("") +
   ggtitle("Consumption by Governorate",
           subtitle = "Year: 2015") +
-  labs(x = "Consumption (millions)", caption = "Source: L'Institut National de la Statistique (INS)") +
+  labs(x = "Consumption (thousands)", caption = "Source: L'Institut National de la Statistique (INS)") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
   theme(plot.caption = element_text(color = "grey68"))
 g
 ```
 
-Comments:
-- note sfax is part of top 5 but is a clear outlier in the lowess plot
+This is a dot plot of consumption per capita (see 4.c for a thorough definition of this variable) by governorate for the year 2015. Tunis has the highest consumption per capita in the country, while Monastir, Ben Arous, and Manouba, which are essentially three suburban regions close to Tunis geographically are also fairly close to it in terms of consumption. Sfax appears as having a high level of consumption per capita, despite having low luminosity as we have seen in the previous graph. Therefore even by per capita measures Sfax seems to have a high level of economic activity, yet low total luminosity. We take a closer look at luminosity in Sfax in the next section.
+
+The rest of the governorates are fairly close to one another, suggesting that there are a few governorates in Tunisia that make up a a disproportionate share of the consumption in the country. 
+
+Note that we divided the consumption figure by a million, so the x-axis in this graph is consumption in thousands of dinar. 
+
 
 ### (4.e) A closer at outliers: Sfax
 ```{r message = FALSE, warning = FALSE}
@@ -407,6 +404,8 @@ This plot compares the number of leisure resources per household by governorate.
 
 Finally, we take a look at how luminosity has changed over time in order to gleam insights about how they may reveal changes in Tunisia economic activity throughout the years. Note that we previously could not look at how luminosity compared to governorate-level economic indicators such as household appliances, leisure resources, and consumption over time because of data limitations, namely that those metrics have not been been consistently measured throughout the years in Tunisia. 
 
+### (4.g) Luminosity & the Tunisian Economy, 1992-2013
+
 ```{r message = FALSE, warning = FALSE}
 lum <- read_csv("../data/final/tun_lum_governorate_93_13_tidy.csv")
 
@@ -451,7 +450,7 @@ ggplot(subset(melt_tunisia, variable %in% c("avg_lum", "govt_debt", "gdp_per_cap
        y=indexedvalue,
        color=variable, group = variable))+
   geom_line() + ggtitle("Indexed Economic Indicators for Tunisia", subtitle = "1992 - 2013") +
-  scale_color_discrete(name = "Variable", labels = c("GDP Growth Rate", "GDP per capita (PPP)", "Inflation Rate", "Unemployment Rate", "Government Debt", "Luminosity")) + xlab("Year") + ylab("Indexed Value") + labs(color='Variable', caption = "Source: L'Institut National de la Statistique (INS)") + 
+  scale_color_discrete(name = "Variable", labels = c("GDP Growth Rate", "GDP per capita (PPP)", "Inflation Rate", "Unemployment Rate", "Government Debt", "Luminosity")) + xlab("Year") + ylab("Indexed Value") + labs(color='Variable', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database") + 
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
   theme(plot.caption = element_text(color = "grey68"))
@@ -484,7 +483,7 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
           subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
-  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value")
+  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value") + labs(color='Normalized Value', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")
 ```
 
 This graph shows the normalized relationship between the level of luminosity and GDP per capita PPP in Tunisia from 1992 to 2013. While the correlation between the two measures is 0.74 and both show an overall upward trend during the given time interval, we can see that GDP per capita (PPP) is a relatively stable measure, while the level of luminosity wildly fluctuates from year to year. This suggests that GDP per capita is a more reliable measure of economic activity compared to the level of luminosity. 
@@ -498,7 +497,7 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
           subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
-  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value")
+  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value") + labs(color='Normalized Value', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")
 ```
 
 Recall that luminosity and GDP growth have a slightly negative relationship (-0.38). This may provide some evidence for the theory of economic convergence, namely that poorer regions (that we assume to be lower in luminosity) grow at faster rates than more developed regions. This graph of the relationship between the two variables shows that when normalized luminosity is low, normalized gdp growth tends to be high and vice versa; observe the time ranges of 1995-2000, 2003 to 2008, and 2011-2013 to see this trend.
@@ -511,7 +510,7 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
   ggtitle("Luminosity vs. Government Debt in Tunisia (Normalized)", subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
-  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value")			  
+  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value") + labs(color='Normalized Value', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")			  
 	         
 ```
 
