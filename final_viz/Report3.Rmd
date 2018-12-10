@@ -570,3 +570,5 @@ ggplot(subset(lum, NAME_1 %in% c("Tunis", "Sfax", "Monastir", "Tataouine")),
 ylab("Luminosity") +
 ggtitle("Luminosity of Four Governorates by Year") + labs(color='Governorate') 
 ```
+
+This is a representative subset of high, medium, and low level luminosity governorates as well as Sfax. From this we can see that the governorates are at completely different levels, but actually move fairly similarly throughout the years; overall if one governorate increases in luminosity for a given year, from this graph it is very reasonable to infer that the other governorates will increase in luminosity as well (and vice versa for decreases in luminosity). The Sfax and Tatouine governorates in particular almost seem to operate in unison, with Sfax having a slightly higher level of luminosity throughout but with their time-series lines over time looking very similar. 
