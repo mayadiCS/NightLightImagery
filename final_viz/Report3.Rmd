@@ -86,6 +86,7 @@ occupation <- occupation %>%
 
 ```
 
+
 ```{r, fig.width=13, message = FALSE, warning = FALSE}
 library(GGally)
 # add y label - percent of total pop over 15 employed
@@ -103,8 +104,7 @@ ggparcoord(occupation, columns = 3:11, alphaLines = .5,
   theme(plot.caption = element_text(color = "grey68"))
 ```
 
-Comments:
-- interesting peak for mines/energy and manufactoring
+This plot shows one line per governorate per gender for the year 2014, with the Y value representing the fraction of total persons fifteen years or older that are employed in that industry. It allows us to observe disparities between employment sector trends between men and women, as well as which employment sectors tend to to be positively and negatively associated with one another. We see that in general, more men are employed than women despite the gender distribution of population being relatively equal.  Some industries (like public works and energy and mining) show nearly no participation by women across the board. Others, like manufacturing, show a wide array of values for both genders.  The highest peak of manufacturing by a decent margin is actually for women. It’s difficult to discern any significant correlations between industries from this plot.
 
 ### (4.c) Consumption by Governorates
 
@@ -289,6 +289,8 @@ g_stacked <- ggplot(appliances_tidy, aes(y = appliances_household,
 g_stacked
 ```
 
+This plot compares the numbers of functional appliances per household by governorate.  Appliances examined are air conditioners, dishwashers, refrigerators, heaters, stoves, and washing machines. Refrigerators are the most ubiquitous appliance, with the average per household being nearly 1 across the board. Next are stoves and washing machines which are still relatively common, but with some governorates having only around .5 per household. Dishwashers are extremely uncommon even in urban governorates like Ariana and Tunis.  Heating is similar. Air conditioning shows a decent amount of variation between governorates and doesn’t seem to be purely associated with urbanicity.  In future work it would be interesting to look at how correlated number of air conditioners is with the average temperature of the governorate. A common theme among the total average number of appliances per household is that landlocked governorates (which also tend to have lower consumption) tend to have less resources.
+
 ```{r message = FALSE, warning = FALSE}
 internet <- read_tun_data(here("data/raw", 
                                  "Households by possession of ICTs 11_18_2018 02_51_58.xlsx")) %>% 
@@ -345,6 +347,8 @@ g_stacked <- ggplot(internet_tidy, aes(y = ict_household,
 g_stacked
 ```
 
+This plot compares the number of Information and Communication Technologies (ICT) resources per household by governorate. ICTs examined are mobile phones, landline phones, internet connections, and computers. We quickly see that mobile phones have a similar role in this plot to refrigerators in the previous one; nearly every household has at least one. Landlines vary more and more common in urban centers like Sfax, Tunis, Ariana and Ben Arous. There seems to be a correlation between landlines and internet connections, and the numbers often appear to be very similar.  This may be because the same companies service phone landlines and internet connections, and bundle the two. Numbers for computers also appear to very similar to internet connections as well, even more so than landlines.  We observe the same phenomenon here for total number of ICTs per household as in appliances, where we see less total ICTs in landlocked governorates (although Tataouine and Kebili do not quite follow these trends).
+
 # Leisure Resources
 ```{r message = FALSE, warning = FALSE}
 leisure <- read_tun_data(here("data/raw", 
@@ -398,6 +402,8 @@ g_stacked <- ggplot(leisure_tidy, aes(y = leisure_household,
 g_stacked
 
 ```
+
+This plot compares the number of leisure resources per household by governorate. Leisure resources examined are televisions, radios, satellite dishes (for television), and cars. Nearly every household has at least one television and radio in all governorates.  Satellite dishes are relatively rare but don’t seem to follow the same trends that we’ve seen for other resources with correlations to consumption and whether or not the governorate is coastal. Du kef, for example, has a decently high proportion of satellite dishes when compared to other governorates, despite having low total levels of leisure and ICT resources. Results for differences by car are a little more difficult to interpret, and I believe there are many factors at play there including how urban and driveable a governorate is, availability of public transportation, and whether people need to drive cars for work.  
 
 Finally, we take a look at how luminosity has changed over time in order to gleam insights about how they may reveal changes in Tunisia economic activity throughout the years. Note that we previously could not look at how luminosity compared to governorate-level economic indicators such as household appliances, leisure resources, and consumption over time because of data limitations, namely that those metrics have not been been consistently measured throughout the years in Tunisia. 
 
@@ -529,6 +535,8 @@ Finally, the negative relationship between government debt and luminosity can be
 
 ## Appendix
 
+While we believe the stacked bar charts to be a better representation to compare total numbers of resources by governorate, it can sometimes be difficult to interpret data values in isolation.  For this reason we also included a faceted Cleveland dot plot for easier direct lookup of data for an individual governorate. 
+
 ```{r, fig.height=10}
 g_dot_facet <- ggplot(appliances_tidy, aes(x = appliances_household,
                                   y = reorder(Region, appliances_household))) + 
@@ -555,6 +563,7 @@ g_dot_facet <- ggplot(leisure_tidy, aes(x = leisure_household,
 
 g_dot_facet + facet_wrap(~leisure_type, ncol=1)
 ```
+
 
 ```{r}
 # Subset of Data
