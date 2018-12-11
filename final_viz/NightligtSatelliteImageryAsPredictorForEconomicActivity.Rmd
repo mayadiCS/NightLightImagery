@@ -88,6 +88,8 @@ We then used the QGIS zonal statistics tool to gather aggregated luminosity data
 - **Mean**: Sample mean of all pixel values within the geographic unit.  This is our most used summary statistic and our primary means of comparing the luminosity between governorates, as it is not dependent on area.
 - **Variance**: Sample variance of all pixel values within the geographic unit.  We believe this can be used to identify governorates that are small and very uniformly lit (which should have lower variance) from governorates that have some highly lit areas and other very dark areas, even though the two may have similar mean luminosity.
 
+Note: Relevant QGis screenshots have been added to the Appendix.
+
 ### Economic Data
 Most economic statistics were collected from the Tunisia Data Portal at http://dataportal.ins.tn/en/. This website is run by the L'Institut National de la Statistique (INS) of Tunisia. We were primarily interested in governorate-level data as opposed to national-level accounts, as we wanted to study within-country variation in luminosity and economic activity. We chose to focus on Tunisian economic data from 2014 because studies have indicated that luminosity is a better indicator for cross-sectional as opposed to panel/time-series data (Chen 2010). The data came from the Tunisia’s government 2014 Census.
 
@@ -636,8 +638,7 @@ Finally, the negative relationship between government debt and luminosity can be
 We began this project with the intention of exposing a connection between luminosity in nighttime satellite images and economic attributes within the country of Tunisia.  We decided to look at the country both as a whole and by governorate, an administrative boundary which serves a similar function as a state in the United States. We began by examining how these governorates differ from one another.  The first thing we chose to examine was population density. We had a hypothesis that more densely populated governorates would have higher luminosity, so we wanted to identify which governorates to focus on for these analyses. 
 
 ```{r message=FALSE, warning=FALSE}
-admin1_choropleth("tunisia", density, num_colors = 7, title = "Population Density", 
-  legend = "Population Density (km\u00b2)") +
+admin1_choropleth("tunisia", density, num_colors = 7, title = "Population Density", legend = "Population Density (km\u00b2)") +
   ggtitle("Tunisia's Population Density by Governorate",
           subtitle = "Year: 2014") +
   labs(caption = "Source: L'Institut National de la Statistique (INS)") +
@@ -651,8 +652,7 @@ This graph gave us our first indications that if luminosity and population densi
 The other variable we expected to be strongly correlated with luminosity is consumption per capita.  Consumption measures how much money people are spending, and is an indicator of a strong economy.
 
 ```{r message=FALSE, warning=FALSE}
-admin1_region_choropleth(df, num_colors= 1, 
- legend = "Consumption by Millions of Tunisian Dinar (TND)") +
+admin1_region_choropleth(df, num_colors= 1, legend = "Consumption by Millions of Tunisian Dinar (TND)") +
   ggtitle("Consumption by Governorate",
           subtitle = "Year: 2015") +
   labs(caption = "Source: L'Institut National de la Statistique (INS)") +
@@ -675,8 +675,7 @@ geom_line() +
 scale_colour_brewer(palette="Set3") +
 xlab("Year") +
 ylab("Luminosity (watts/cm\u00b2)") +
-labs(color='Governorate', 
-    caption = "Source: L'Institut National de la Statistique (INS)") +
+labs(color='Governorate', caption = "Source: L'Institut National de la Statistique (INS)") +
     ggtitle("Luminosity by Governorate by Year",
           subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
@@ -687,10 +686,11 @@ labs(color='Governorate',
 This shows luminosity data over time for several select governorates. While a number of factors make it difficult for us to make year-to-year comparisons for satellite luminosity data, from this chart we can observe the following:
 
 - Tunis, as would be expected from its high levels of population density and consumption per capita, has the highest levels of luminosity by a wide margin. Population density and consumption per capita also seem to generally be relatively good predictors of luminosity.
-- Luminosity collected in this manner and viewed as a time series is noisy. In general it trends upwards over time, but the relationship isn't smooth and simple.  The sharp changes from year to year are difficult to attribute a definite source to.
-- All the governorates generally seem to be subject to these sharp yearly changes in very similar ways.
+- Luminosity collected in this manner and viewed as a time series is noisy. In general it trends upwards over time, but the relationship isn't smooth and simple.
+- Although luminosity is unstable from year to year, the governorates generally seem to be subject to these sharp yearly changes in very similar ways. There does not appear to be a lot of variation in luminosity between the governorates from year to year.
+- There is a very sharp downward spike in luminosity in 2011 that coincides with the Tunisian Revolution. It is possible that the political and economic turmoil of that revolution had a big negative shock on Tunisia's luminosity for that year.
 
-Our final aim was to draw a connection between economic indicators and luminosity in Tunisia:
+Our final aim was to draw a connection between various economic indicators and luminosity in Tunisia over time:
 
 ```{r}
 ggplot() + 
@@ -700,12 +700,10 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
   ggtitle("Luminosity vs. Government Debt in Tunisia (Normalized)", subtitle = "1992 - 2013") +
   theme(plot.title = element_text(face = "bold")) +
   theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
-  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +
-  ylab("Normalized Value") + labs(color='Normalized Value', 
-  caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")			  
+  theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value") + labs(color='Normalized Value', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")			  
 ```
 
-This graph shows one of our most interesting findings.  Its comparing luminosity (watts/ cm<sup>2</sup>) and government debt (TND), with both values scaled from 0 to 1 to show effects despite the two being on different scales. While difficult to be sure of due to noisy luminosity data, we see a definite inverse relationship between luminosity and government debt.  We suspect that this is because as the government goes into more debt, it invests more money in resources and infrastructure which ultimately increase luminosity. 
+This graph shows one of our most interesting findings.  It compares luminosity (watts/ cm<sup>2</sup>) and government debt (TND), with both values scaled from 0 to 1 to show effects despite the two being on different scales. It illustrates (1) just how unstable luminosity is from year to year, even as it has generally gone up in the long run and (2) a fairly strong inverse relationship between luminosity and government debt. From 1992 to 2000, normalized government debt is high while normalized luminosity is low. From 2000 onwards, government debt begins to steadily decrease until 2011 (again, the year of the Tunisian Revolution) when it sharply spikes again. Luminosity increases from 2001 to 2013, but again in a very non-linear way. Overall, the main takeaway from this graph is that even as luminosity generally increases over time, it fluctuates wildly from year to year, much more so than other panel data economic indicators such as government debt. 
 
 ## (6) Interactive component
 
@@ -723,18 +721,31 @@ The app is experiencing some latency issues. We apologize for the inconvenience.
 
 
 ## (7) Conclusion
-We chose to perform this analysis on Tunisia rather than the United States or any other country because as a group we were inspired by our teammate’s personal connection to the country.  Although historically there has been work done to connect luminosity data to economic indicators, places like Tunisia and its neighbors too often go ignored in 
-these types of analyses.
+We chose to perform this analysis on Tunisia rather than the United States or any other country because as a group we were inspired by our teammate’s personal connection to the country. Although historically there has been some work done to connect luminosity data to economic indicators, developing countries like Tunisia and its neighbors have often been neglected  in these types of analyses.
 
 As one would be expect, mean luminosity over the country in general increased over time from 1992 to 2013.  However, due to the satellite data limitations discussed above, the trend is subject to sudden changes that may or may not reflect actual luminosity changes.  This makes it difficult to look at luminosity longitudinally. 
 
 Perhaps the largest connections between luminosity and other data were made based on consumption per capita (a measure of economic activity) and geographic location. Coastal governorates tend to have higher consumption and luminosity.  This is likely because these governorates contain established port cities such as Tunis and Sfax, where trade brings in money and increases consumption. We believe this is the primary driving force behind luminosity.
 
-With that being said, there was is a lot of data that we didn’t have time to analyze in as much depth as we’d have preferred, and some we couldn’t get to at all. We’d also have preferred to have some additional economic indicators per governorate, such as median household income.  We’d also like to do more direct comparisons between some of the data from the Tunisia Data Portal (resources, employment industry) and luminosity. And despite having many variables to explore, most of them only had data for 2014, which was after our luminosity data ended in 2013.  It would be preferable to have this data in time series format as well, so we could look at luminosity along with these variables together longitudinally.
+We also compared changes in luminosity over time to economic indicators such as GDP per capita, GDP growth, and government debt on a national level from 1992 to 2013. We found that while luminosity has fairly strong relationships with some of these economic indicators, as a variable it is extremely unstable from year to year. This suggests that it would not be that reliable of a measure in any given year, but when aggregated over longer timespans can be as representative of Tunisia's economic performance as other measures.
 
-One of our most important lessons learned during the course of this project is to be skeptical of our biases and preconceived notions when analyzing a dataset, as we were often surprised by what we found.  For instance, the high rates of women working manufacturing jobs in some governorates, and the relatively high consumption of some larger more desertous governorates such as Tataouine, which was the inspiration for Luke Skywalker’s lawless backwater planet in Star Wars. We also learned how US-centric many online tools and resources can be. It is much easier to create a map of the United States than any other country using R. That being said, there are people working hard to extend resources to cover less commonly examined regions.  ChoroplethrAdmin1, despite its limitations (it is missing a governorate and doesn’t support French language well) is an incredibly useful tool. The Database of Global Administrative areas from which we sourced the shapefiles for Tunisian governorates and delegations also comes to mind. We believe that in shining a light on Tunisia in this manner we have learned several important lessons and made good use of data that perhaps doesn’t get the attention it deserves.      
+With that being said, there was is a lot of data that we didn’t have time to analyze in as much depth as we’d have preferred, and some we couldn’t get to at all. We’d also have preferred to have some additional economic indicators per governorate, such as median household income or GDP per capita.  We’d also like to do more direct comparisons between some of the data from the Tunisia Data Portal (resources, employment industry) and luminosity. And despite having many variables to explore, most of them only had data for 2014, which was after our luminosity data ended in 2013.  It would be preferable to have this data in time series and by governorate as well, so we could look at luminosity along with these variables together longitudinally and on a subnational level.
+
+One of our most important lessons learned during the course of this project is to be skeptical of our biases and preconceived notions when analyzing a dataset, as we were often surprised by what we found.  For instance, the high rates of women working manufacturing jobs in some governorates, and the relatively high consumption of some larger more desertous governorates such as Tataouine, which was the inspiration for Luke Skywalker’s lawless backwater planet in Star Wars. We also learned how US-centric many online tools and resources can be. It is much easier to create a map of the United States than any other country using R. That being said, there are people working hard to extend resources to cover less commonly examined regions.  ChoroplethrAdmin1, despite its limitations (it is missing a governorate and doesn’t support French language well) is an incredibly useful tool. The Database of Global Administrative areas from which we sourced the shapefiles for Tunisian governorates and delegations also comes to mind. We believe that in shining a light on Tunisia in this manner we have learned several important lessons and made good use of data that historically has not gotten the attention that it deserves.      
+
+
+## Citations
+Chen, Xi, and William D. Nordhaus. The value of luminosity data as a proxy for economic statistics. No. w16317. National Bureau of Economic Research, 2010.
+
+Elvidge, Christopher D., et al. "Potential for global mapping of development via a nightsat mission." GeoJournal 69.1-2 (2007): 45-53.
+
+Henderson, J. Vernon, Adam Storeygard, and David N. Weil. "Measuring economic growth from outer space." American economic review 102.2 (2012): 994-1028.
+
+Michalopoulos, Stelios, and Elias Papaioannou. "Pre‐colonial ethnic institutions and contemporary African development." Econometrica 81.1 (2013): 113-152.     
 
 ## Appendix
+
+### Section I
 
 While we believe the stacked bar charts to be a better representation to compare total numbers of resources by governorate, it can sometimes be difficult to interpret data values in isolation.  For this reason we also included a faceted Cleveland dot plot for easier direct lookup of data for an individual governorate. 
 
@@ -778,3 +789,15 @@ ggtitle("Luminosity of Four Governorates by Year") + labs(color='Governorate')
 ```
 
 This is a representative subset of high, medium, and low level luminosity governorates as well as Sfax. From this we can see that the governorates are at completely different levels, but actually move fairly similarly throughout the years; overall if one governorate increases in luminosity for a given year, from this graph it is very reasonable to infer that the other governorates will increase in luminosity as well (and vice versa for decreases in luminosity). The Sfax and Tatouine governorates in particular almost seem to operate in unison, with Sfax having a slightly higher level of luminosity throughout but with their time-series lines over time looking very similar. 
+
+### Section II
+
+QGis Full Window:
+![QGIS Full Window](../img/qgis_map.png)
+
+QGis Raster settings:
+![QGIS Raster popup](../img/qgis_raster.png)
+
+
+Producing various luminsoty statistics using Zonal Stat:
+![QGIS Zonalstat](../img/qgis_zonal_stat.png)
