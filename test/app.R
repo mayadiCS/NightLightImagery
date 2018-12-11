@@ -11,7 +11,13 @@ library(rsconnect)
 ui <- fluidPage(
   
   # Application title
-  titlePanel("Explore luminosity over time by Tunisian governorates"),
+  
+  tags$h3("Explore luminosity over time by Tunisian governorates"),
+  tags$h5("For a GIF version of the original NASA satellite imagery used,"),
+  tags$head(tags$style("#number{
+                       display:inline
+                       }")), h5('please visit:',style="display:inline"), a(href= "https://github.com/mariemayadi/data/blob/master/luminosityOverTimeTunisia.gif", "Luminosity GIF"),
+
   
   plotOutput('mapLum'),
   
@@ -37,25 +43,22 @@ ui <- fluidPage(
 server <- function(input, output) {
    
    output$dotplot <- renderPlot({
-      # generate bins based on input$bins from ui.R
-      ##lumData <- read_csv(here("tun_lum_governorate_93_13_tidy.csv")) 
+
       lumData <- read.csv(url("https://raw.githubusercontent.com/mariemayadi/data/master/tun_lum_governorate_93_13_tidy.csv"))
       lumData2013 <- lumData[lumData$year == input$years,]
       
-      # x    <- faithful[, 2] 
-      # bins <- seq(min(x), max(x), length.out = input$bins + 1)
-      # 
-      # # draw the histogram with the specified number of bins
-      # hist(x, breaks = bins, col = 'darkgray', border = 'white')
-      
       ggplot(lumData2013, aes(x = mean, y = fct_reorder(NAME_1, mean))) +
-        geom_point(color = "blue") + ylab("") +
-        ggtitle("Luminosity per Governovates in 2013 (mean)")
+        geom_point(color = "black") + ylab("") +
+        ggtitle("Ranking of governorates by luminosity",
+                subtitle = "Country: Tunisia") +
+        labs(x="Mean Luminosity (watts/cm\u00b2)", caption = "Source: L'Institut National de la Statistique (INS)") +
+        theme(plot.title = element_text(face = "bold")) +
+        theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+        theme(plot.caption = element_text(color = "grey68"))
+
    })
    
    output$mapLum <- renderPlot({
-     # generate bins based on input$bins from ui.R
-     ##lumData <- read_csv(here("../  tun_lum_governorate_93_13_tidy.csv"))
      lumData <- read.csv(url("https://raw.githubusercontent.com/mariemayadi/data/master/tun_lum_governorate_93_13_tidy.csv"))
      lumData2013 <- lumData[lumData$year == input$years,]
      
@@ -65,7 +68,14 @@ server <- function(input, output) {
      
      df = data.frame(region=tidyLum13$NAME_1, value=as.numeric(as.character(tidyLum13$mean)))
      
-     admin1_region_choropleth(df) 
+     admin1_region_choropleth(df, legend = "Mean luminosity (watts/cm\u00b2)") +
+       ggtitle("Map of luminosity by Governorates",
+               subtitle = "Country: Tunisia") +
+       labs(caption = "Source: L'Institut National de la Statistique (INS)") +
+       theme(plot.title = element_text(face = "bold")) +
+       theme(plot.subtitle = element_text(face = "bold", color = "grey35")) +
+       theme(plot.caption = element_text(color = "grey68"))
+     
    })
 }
 
