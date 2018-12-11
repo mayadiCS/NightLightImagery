@@ -67,7 +67,7 @@ grid.arrange(imgLoc, imgGov, ncol = 2)
 
 ### Team contribution
 
-The work was evenly split between our three team members: Jesse P Cahill, Mariem Ayadi and Namson Ngo-Le. Initially, two of us teamed up to familirize ourselves with using QGis to ingest and process the NOAA sattelite imagery. Another team member focused on reading relevant research papers and extracting data from the Tunisian National Institute of Statistics (INS). At a later stage, each member was assigned a third of all of the collected input data and was tasked to create insightful exploratory graphs that would help answer our research question. As a team, we then were able to modify, integrate and create a story line around the created visuals.
+The work was evenly split between our three team members: Jesse P Cahill, Mariem Ayadi and Namson Ngo-Le. Initially, two of us teamed up to familiarize ourselves with using QGis to ingest and process the NOAA satellite imagery. Another team member focused on reading relevant research papers and extracting data from the Tunisian National Institute of Statistics (INS). At a later stage, each member was assigned a third of all of the collected input data and was tasked to create insightful exploratory graphs that would help answer our research questions. As a team, we then were able to modify, integrate and generate a report based on the created visuals.
 
 ## (2) Description of data
 
@@ -95,7 +95,9 @@ Most economic statistics were collected from the Tunisia Data Portal at http://d
 
 We were able to download csv files of statistical data for variables such as households by possession of leisure resources and Information and Communication Technologies (ICT’s), access to public services, and workers in particular industries (e.g. agriculture, manufacturing, mining). We then selected a few indicators that we believed were relevant to the comparison of luminosity to economic variables. Finally, we did some minor formatting changes of the csv files such as renaming variables and sorting rows and columns before exporting them into R for visualization and analysis.
 
-We also collected some national-level time-series economic data for Tunisia from the IMF World Economic Outlook Database. These variables were total GDP, GDP per capita, GDP growth, inflation, unemployment rates, and government debt from 1992 until 2013 and were used in comparison to national-level measures of luminosity in our project.This data is mostly self-explanatory and easy to access at this link: https://www.imf.org/external/pubs/ft/weo/2018/01/weodata/weorept.aspx?pr.x=96&pr.y=0&sy=1980&ey=2023&scsm=1&ssd=1&sort=country&ds=.&br=1&c=744&s=NGDP_RPCH,PPPGDP,PPPPC,PCPIPCH,LUR,GGXWDG_NGDP&grp=0&a=
+We also collected some national-level time-series economic data for Tunisia from the IMF World Economic Outlook Database. These variables were total GDP, GDP per capita, GDP growth, inflation, unemployment rates, and government debt from 1992 until 2013 and were used in comparison to national-level measures of luminosity in our project.This data is mostly self-explanatory and easy to access at this link: https://www.imf.org/external/pubs/ft/weo/2018/01/weodata/weorept.aspx?
+pr.x=96&pr.y=0&sy=1980&ey=2023&scsm=1&ssd=1&sort=country&ds=.&br=1&c=744
+&s=NGDP_RPCH,PPPGDP,PPPPC,PCPIPCH,LUR,GGXWDG_NGDP&grp=0&a=
 
 ## (3) Analysis of data quality
 
@@ -238,7 +240,7 @@ admin1_region_choropleth(df,
 
 ```
 
-The variable consumption here is defined as the average consumption per capita of each governorate in 2015. Total consumption is a sum of the consumption of products and services such as alcohol, furniture, cultural activities, restaurants, and transportation for each governorate. The units are in the Tunisian currency dinar (TND), and the first comma from the right is a separator for the amount of millimes and dinars (which are roughly analogous to American cents and dollars, with the difference being that 1000 millimes = 1 dinar). Thus for example the highest measure of consumption per capita in the data set is Tunis with 5,809 dinars and 925 millimes.
+The variable consumption here is defined as the average consumption per capita of each governorate in 2015. Total consumption is a sum of the consumption of products and services such as alcohol, furniture, cultural activities, restaurants, and transportation for each governorate. The units are in the Tunisian currency dinar, and the first comma from the right is a separator for the amount of millimes and dinars (which are roughly analogous to American cents and dollars, with the difference being that 1000 millimes = 1 dinar). Thus for example the highest measure of consumption per capita in the data set is Tunis with 5,809 dinars and 925 millimes.
 
 While the wealthy coastal governorates have the highest levels of consumption per capita, there are some subtle differences from the population density choroplethr plot. Consumption is lowest in some of the inland northwest governorates, while the southern, sparsely populated governorates have relatively high levels of consumption per capita compared to the rest of the country. 
 
@@ -268,7 +270,7 @@ ggplot(dataset, aes(population,mean)) +
 
 ```
 
-This scatter plot of mean luminosity (in watts/cm2) against population (in thousands) by governorate shows some interesting trends, especially for the two high-population governorates of Tunis and Sfax to the right of the graph. Overall with the loess smoother, we can see that as expected there is a general upward trend in that as population increases, luminosity also increases. However, Tunis is significantly above the trendline, suggesting that it has a extraordinarily high level of luminosity compared to its population (which is 1,056,247 million to be exact). This further reinforces the point that commercial activity in Tunisia is heavily concentrated in Tunis.
+This scatter plot of mean luminosity (in watts/cm2) against population (in thousands) by governorate shows some interesting trends, especially for the two high population governorates of Tunis and Sfax to the right of the graph. Overall with the loess smoother, we can see that as expected there is a general upward trend in that as population increases, luminosity also increases. However, Tunis is significantly above the trendline, suggesting that it has a extraordinarily high level of luminosity compared to its population (which is 1,056,247 million to be exact). This further reinforces the point that commercial activity in Tunisia is heavily concentrated in Tunis.
 
 In contrast, Sfax (population 1,113,496) is sharply below the trendline. While Sfax is even more populous than Tunis, it has a significantly lower level of mean luminosity relative to population than the rest of Tunisia. This is a rather bizarre finding that merits further exploration. We decided to take a look at consumption per governorate to see if it could tell us anything about the outlier of Sfax.
 
@@ -291,7 +293,7 @@ This is a dot plot of consumption per capita (see 4.c for a thorough definition 
 
 The rest of the governorates are fairly close to one another, suggesting that there are a few governorates in Tunisia that make up a a disproportionate share of the consumption in the country. 
 
-Note that we divided the consumption figure by a million, so the x-axis in this graph is consumption in thousands of dinar. 
+Note that we divided the consumption figure by a million, so the x-axis in this graph is consumption in thousands of Tunisian Dinars (TND). 
 
 
 ### (4.e) A closer at outliers: Sfax
@@ -506,7 +508,7 @@ g_stacked
 
 This plot compares the number of leisure resources per household by governorate. Leisure resources examined are televisions, radios, satellite dishes (for television), and cars. Nearly every household has at least one television and radio in all governorates.  Satellite dishes are relatively rare but don’t seem to follow the same trends that we’ve seen for other resources with correlations to consumption and whether or not the governorate is coastal. Du kef, for example, has a decently high proportion of satellite dishes when compared to other governorates, despite having low total levels of leisure and ICT resources. Results for differences by car are a little more difficult to interpret, and I believe there are many factors at play there including how urban and driveable a governorate is, availability of public transportation, and whether people need to drive cars for work.  
 
-Finally, we take a look at how luminosity has changed over time in order to gleam insights about how they may reveal changes in Tunisia economic activity throughout the years. Note that we previously could not look at how luminosity compared to governorate-level economic indicators such as household appliances, leisure resources, and consumption over time because of data limitations, namely that those metrics have not been been consistently measured throughout the years in Tunisia. 
+Finally, we take a look at how luminosity has changed over time in order to gleam insights about how they may reveal changes in Tunisia economic activity throughout the years. Note that we previously could not look at how luminosity compared to governorate-level economic indicators such as household appliances, leisure resources, and consumption over time because of data limitations, namely that those metrics have not been been consistently measured throughout the years in Tunisia.
 
 ### (4.g) Luminosity & the Tunisian Economy, 1992-2013
 
@@ -568,7 +570,7 @@ caption = "Sources: L'Institut National de la Statistique (INS), IMF World Econo
 
 This plot further explores the connection between luminosity and Tunisian economic indicators from 1992 to 2013, but this time on a national level. Note that each variable is indexed to the value from the base year of 1992 and at the starting value of 100. 
 
-The variable ‘avg_lum’ in this plot is the average level of luminosity in watts/cm2 for the entire country of Tunisia from 1992 to 2013. This is calculated by summing up the total sum of pixel values of luminosity for all of the governorates as well the total count of the number of pixels for each governorate (which is essentially a static number of the amount of pixels that comprise a given land area) for all of Tunisia, then dividing the total sum by the total count for each year from 1992 to 2013. 
+'Luminosity' in this plot is the average level of luminosity in watts/cm2 for the entire country of Tunisia from 1992 to 2013. This is calculated by summing up the total sum of pixel values of luminosity for all of the governorates as well the total count of the number of pixels for each governorate (which is essentially a static number of the amount of pixels that comprise a given land area) for all of Tunisia, then dividing the total sum by the total count for each year from 1992 to 2013. 
 
 As we have noted before, while there is a general upward trend in luminosity from 1992 to 2013, it is not consistent from year to year. In contrast GDP per capita has increased every single year since 1992 with the exception of 2011. In 2011, both GDP growth and GDP per capita sharply fall, while luminosity, inflation, the unemployment rate, and government debt all increase to varying degrees. Overall 2011 was a very bad year for Tunisia economically. 
 
@@ -633,7 +635,7 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
 Finally, the negative relationship between government debt and luminosity can be seen in this graph. From 1992 to 2000, normalized government debt is high while normalized luminosity is low. From 2000 onwards, government debt begins to steadily decrease until 2011 when it sharply spikes again. Luminosity generally seems to climb over this timespan, but again in a very non-linear way. Overall, it is clear from these graphs that even as luminosity generally increases over time, it fluctuates wildly from year to year, much more so than other, more official economic indicators that are measured across time.
 
 
-## (5) Executive summary (Presentation-style)
+## (5) Executive summary
 
 We began this project with the intention of exposing a connection between luminosity in nighttime satellite images and economic attributes within the country of Tunisia.  We decided to look at the country both as a whole and by governorate, an administrative boundary which serves a similar function as a state in the United States. We began by examining how these governorates differ from one another.  The first thing we chose to examine was population density. We had a hypothesis that more densely populated governorates would have higher luminosity, so we wanted to identify which governorates to focus on for these analyses. 
 
@@ -703,7 +705,7 @@ geom_line(data=tunisia,aes(y = rescale(avg_lum),x= year,colour="darkblue"),size=
   theme(plot.caption = element_text(color = "grey68")) + xlab("Year") +ylab("Normalized Value") + labs(color='Normalized Value', caption = "Sources: L'Institut National de la Statistique (INS), IMF World Economic Outlook Database")			  
 ```
 
-This graph shows one of our most interesting findings.  It compares luminosity (watts/ cm<sup>2</sup>) and government debt (TND), with both values scaled from 0 to 1 to show effects despite the two being on different scales. It illustrates (1) just how unstable luminosity is from year to year, even as it has generally gone up in the long run and (2) a fairly strong inverse relationship between luminosity and government debt. From 1992 to 2000, normalized government debt is high while normalized luminosity is low. From 2000 onwards, government debt begins to steadily decrease until 2011 (again, the year of the Tunisian Revolution) when it sharply spikes again. Luminosity increases from 2001 to 2013, but again in a very non-linear way. Overall, the main takeaway from this graph is that even as luminosity generally increases over time, it fluctuates wildly from year to year, much more so than other panel data economic indicators such as government debt. 
+This graph shows one of our most interesting findings.  It compares luminosity (watts/ cm<sup>2</sup>) and government debt (TND), with both values scaled from 0 to 1 to show effects despite the two being on different scales. It illustrates (1) just how unstable luminosity is from year to year, even as it has generally gone up in the long run and (2) a fairly strong inverse relationship between luminosity and government debt. From 1992 to 2000, normalized government debt is high while normalized luminosity is low. From 2000 onwards, government debt begins to steadily decrease until 2011 (again, the year of the Tunisian Revolution) when it sharply spikes again. Luminosity increases from 2001 to 2013, but again in a very non-linear way. Overall, the main takeaway from this graph is that even as luminosity generally increases over time, it fluctuates wildly from year to year, much more so than other panel data economic indicators such as government debt.
 
 ## (6) Interactive component
 
@@ -792,12 +794,11 @@ This is a representative subset of high, medium, and low level luminosity govern
 
 ### Section II
 
-QGis Full Window:
 ![QGIS Full Window](../img/qgis_map.png)
 
-QGis Raster settings:
+
 ![QGIS Raster popup](../img/qgis_raster.png)
 
 
-Producing various luminsoty statistics using Zonal Stat:
 ![QGIS Zonalstat](../img/qgis_zonal_stat.png)
+
