@@ -10,7 +10,8 @@ library(rsconnect)
 
 ui <- fluidPage(
   
-  title = "Diamonds Explorer",
+  # Application title
+  titlePanel("Explore luminosity over time by Tunisian governorates"),
   
   plotOutput('mapLum'),
   
